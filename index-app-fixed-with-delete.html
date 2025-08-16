@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pallati — Banorë, Faturat, Njoftime</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+  <style>
+    :root{
+      --bg:#f6f7fb; --text:#0f172a; --muted:#64748b; --ring:#e5e7eb;
+      --brand:#4f46e5; --accent:#10b981; --warn:#f59e0b; --danger:#dc2626;
+      --card:#fff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(135deg,#0ea5e9,#10b981);min-height:100vh;color:var(--text)}
+    .wrap{max-width:1100px;margin:0 auto}
+    .hidden{display:none}
+    .muted{color:var(--muted)}
+    .card{background:var(--card);border:1px solid var(--ring);border-radius:16px;box-shadow:0 8px 24px rgba(2,6,23,.10)}
+    .pad{padding:16px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:0;border-radius:12px;cursor:pointer;font-weight:700}
+    .btn-brand{background:var(--brand);color:#fff}
+    .btn-accent{background:var(--accent);color:#fff}
+    .btn-grey{background:#e5e7eb;color:#111827}
+    .btn-red{background:var(--danger);color:#fff}
+    .input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:12px;background:#fff;outline:none}
+    .input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(79,70,229,.2);border-color:var(--brand)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 14px;border-bottom:1px solid #eef2f7;vertical-align:top}
+    thead th{font-size:12px;text-transform:uppercase;color:#64748b;background:#f8fafc}
+    .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .small{padding:6px 10px;border-radius:10px;font-size:12px}
+    .trash{cursor:pointer;color:var(--danger);font-size:18px}
+    header.top{background:#fff}
+    header .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px}
+    .badge{background:#0f172a;color:#fff;border-radius:999px;padding:6px 10px;font-size:12px}
+    .pill{background:#eef2f7;border-radius:999px;padding:6px 10px;font-size:12px}
+    .tabs{display:flex;gap:16px;border-bottom:1px solid var(--ring);padding:0 16px;background:#fff}
+    .tab{background:none;border:0;padding:12px 6px;margin-bottom:-1px;border-bottom:2px solid transparent;color:#475569;cursor:pointer;text-decoration:none}
+    .tab.active{border-color:var(--brand);color:var(--brand);font-weight:700}
+    main{background:#fff;border-top:1px solid var(--ring);border-bottom:1px solid var(--ring)}
+    /* Login */
+    #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .login-card{width:100%;max-width:420px}
+    .login-logo{display:block;margin:6px auto 10px;max-width:180px}
+    /* Admin gate: default fshehur, shfaqet vetëm për admin */
+    .admin-gate{display:none!important}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<section id="login">
+  <div class="login-card card pad">
+    <img class="login-logo" src="https://i.postimg.cc/Pf01SyBG/LEONARD-LOGO.png" alt="Logo">
+    <h2 style="margin:0 0 6px;text-align:center">Hyrje</h2>
+    <div class="muted" style="text-align:center">Default: <b>admin</b> / <b>admin</b></div>
+    <form id="loginForm" style="margin-top:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <input id="loginId" class="input" placeholder="ID" required>
+        <input id="loginPass" class="input" type="password" placeholder="Password" required>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-brand" style="flex:1" type="submit">Hyr</button>
+        <button id="btnResetAdmin" class="btn btn-grey" style="flex:1" type="button">Reset Admin</button>
+      </div>
+      <div id="loginErr" class="muted" style="color:#dc2626;display:none;margin-top:8px">Kredencialet e pasakta.</div>
+    </form>
+  </div>
+</section>
+
+<!-- APP -->
+<section id="app" class="hidden">
+  <header class="top">
+    <div class="wrap">
+      <div class="row">
+        <div style="display:flex;align-items:center;gap:10px">
+          <h2 style="margin:0">Menaxhimi i Pallatit</h2>
+          <span id="role" class="badge">—</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span id="who" class="pill">—</span>
+          <button id="btnChangePw" class="btn btn-grey">Ndrysho Fjalëkalimin</button>
+          <button id="logout" class="btn btn-red">Dil</button>
+        </div>
+      </div>
+    </div>
+    <nav class="tabs">
+      <div class="wrap" style="display:flex;gap:16px">
+        <a class="tab" href="#/banore">Banorët</a>
+        <a class="tab" href="#/fatura">Faturat</a>
+        <a class="tab" href="#/njoftime">Njoftimet</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="wrap" style="padding:16px">
+
+      <!-- Karta: Ndrysho fjalëkalimin -->
+      <div id="pwCard" class="card pad hidden" style="max-width:600px;margin:0 auto 16px;background:#fffafc">
+        <h3 style="margin-top:0">Ndrysho fjalëkalimin</h3>
+        <form id="pwForm" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <input id="pwCurrent" class="input" type="password" placeholder="Fjalëkalimi aktual" required>
+          <div></div>
+          <input id="pwNew" class="input" type="password" placeholder="Fjalëkalimi i ri" required>
+          <input id="pwConfirm" class="input" type="password" placeholder="Përsërit fjalëkalimin e ri" required>
+          <div style="grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+            <button class="btn btn-accent" type="submit">Ruaj</button>
+            <button id="pwCancel" class="btn btn-grey" type="button">Mbyll</button>
+          </div>
+        </form>
+        <div id="pwMsg" class="muted" style="margin-top:6px"></div>
+      </div>
+
+      <!-- BANORËT -->
+      <section id="banore">
+        <div class="card pad" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <h3 style="margin:0">Banorët</h3>
+            <button id="btnToggleAddResident" class="btn btn-brand admin-gate">Shto Banor</button>
+          </div>
+
+          <!-- Forma Shto Banor (vetëm admin) -->
+          <div id="addResidentCard" class="card pad admin-gate hidden" style="margin-top:12px;background:#fbfdff">
+            <form id="residentForm" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+              <input id="rName" class="input" placeholder="Emri i plotë" required>
+              <input id="rApt" class="input" placeholder="Apt" required>
+              <input id="rID" class="input" placeholder="ID (p.sh. hyrja)" required>
+              <input id="rPhone" class="input" placeholder="Telefon" required>
+              <input id="rWA" class="input" placeholder="WhatsApp (ops.)">
+              <input id="rPW" class="input" placeholder="Password fillestar" required>
+              <div style="grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-accent" type="submit">Ruaj banorin</button>
+                <button id="rCancel" class="btn btn-grey" type="button">Anulo</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Forma Ndrysho Banor (vetëm admin) -->
+          <div id="editResidentCard" class="card pad admin-gate hidden" style="margin-top:12px;background:#fffaf0">
+            <form id="residentEditForm" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+              <input id="eID" class="input" placeholder="ID" disabled>
+              <input id="eName" class="input" placeholder="Emri i plotë" required>
+              <input id="eApt" class="input" placeholder="Apt" required>
+              <input id="ePhone" class="input" placeholder="Telefon" required>
+              <input id="eWA" class="input" placeholder="WhatsApp (ops.)">
+              <input id="ePW" class="input" placeholder="Fjalëkalim (lëre bosh për pa ndryshim)">
+              <div style="grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-accent" type="submit">Ruaj ndryshimet</button>
+                <button id="eCancel" class="btn btn-grey" type="button">Mbyll</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card pad">
+          <div style="overflow:auto">
+            <table id="resTable">
+              <thead><tr><th>Emri</th><th>Apt</th><th>Kontakt</th><th>ID</th><th>Veprime</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- FATURAT -->
+      <section id="fatura" class="hidden">
+        <div class="card pad" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <h3 style="margin:0">Faturat</h3>
+            <button id="btnToggleAddBill" class="btn btn-brand admin-gate">Shto Faturë</button>
+          </div>
+
+          <!-- Forma Shto Faturë (vetëm admin) -->
+          <div id="addBillCard" class="card pad admin-gate hidden" style="margin-top:12px;background:#fbfdff">
+            <form id="billForm">
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px">
+                <select id="bResident" class="input" required></select>
+                <input id="bTitle" class="input" value="Shërbimi i ashensorit dhe pastrimit të pallatit" required>
+                <input id="bAmount" class="input" type="number" step="0.01" value="1000" required>
+                <input id="bDue" class="input" type="date" required>
+              </div>
+              <textarea id="bDesc" class="input" rows="3" placeholder="Përshkrimi"></textarea>
+              <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+                <button class="btn btn-accent" type="submit">Ruaj faturën</button>
+                <button id="bCancel" class="btn btn-grey" type="button">Anulo</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card pad">
+          <div style="overflow:auto">
+            <table id="billTable">
+              <thead>
+                <tr>
+                  <th>Nr. Fature</th><th>Banori</th><th>Titulli</th><th>Përshkrimi</th><th>Afati</th><th>Status</th><th>Veprime</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- NJOFTIMET -->
+      <section id="njoftime" class="hidden">
+        <div class="card pad" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <h3 style="margin:0">Njoftimet</h3>
+            <button id="btnToggleAddNotice" class="btn btn-brand admin-gate">Shto Njoftim</button>
+          </div>
+
+          <!-- Forma Shto Njoftim (vetëm admin) -->
+          <div id="addNoticeCard" class="card pad admin-gate hidden" style="margin-top:12px;background:#fbfdff">
+            <form id="noticeForm">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <input id="nTitle" class="input" placeholder="Titulli" required>
+                <input id="nImg" class="input" type="file" accept="image/*">
+              </div>
+              <textarea id="nBody" class="input" rows="3" placeholder="Përshkrimi"></textarea>
+              <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+                <button class="btn btn-accent" type="submit">Ruaj njoftimin</button>
+                <button id="nCancel" class="btn btn-grey" type="button">Anulo</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card pad" id="noticeList"></div>
+      </section>
+
+    </div>
+  </main>
+</section>
+
+<script>
+/* ===== Persistim me localStorage (me fallback) ===== */
+const LS_USERS='pal_users_v4';
+const LS_SESSION='pal_session_v4';
+const LS_BILLS='pal_bills_v4';
+const LS_NOTICES='pal_notices_v4';
+const LS_COUNTER='pal_inv_counter_v4';
+
+const $=(s,r=document)=>r.querySelector(s);
+const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const monthNames=["Janar","Shkurt","Mars","Prill","Maj","Qershor","Korrik","Gusht","Shtator","Tetor","Nëntor","Dhjetor"];
+
+function storageAvailable(){ try{ const k="__t"; localStorage.setItem(k,"1"); localStorage.removeItem(k); return true; }catch(e){ return false; } }
+const HAS_LS = storageAvailable();
+const _mem = {};
+function load(k,d){ try{ if(HAS_LS){ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); } else { return k in _mem?_mem[k]:d; } }catch(e){ return d; } }
+function save(k,v){ try{ if(HAS_LS){ localStorage.setItem(k, JSON.stringify(v)); } else { _mem[k]=v; } }catch(e){ _mem[k]=v; } }
+
+/* ===== Admin default + Reset ===== */
+function ensureAdmin(force=false){
+  let users = load(LS_USERS, []);
+  const adminObj = { id:'admin', pass:'admin', role:'admin', name:'Administrator' };
+  const i = users.findIndex(u => u.id === 'admin');
+  if(i === -1){ users.push(adminObj); }
+  else if(force){ users[i] = adminObj; }
+  save(LS_USERS, users);
+}
+function resetAdmin(){
+  try{
+    if(HAS_LS){
+      [LS_USERS,LS_SESSION,LS_BILLS,LS_NOTICES,LS_COUNTER].forEach(k=>localStorage.removeItem(k));
+    }else{
+      [LS_USERS,LS_SESSION,LS_BILLS,LS_NOTICES,LS_COUNTER].forEach(k=>{ delete _mem[k]; });
+    }
+  }catch{}
+  ensureAdmin(true);
+  alert('U rivendos admin/admin. Po rifreskoj faqen…');
+  location.reload();
+}
+
+/* ===== Login: hap tab të ri pas suksesit ===== */
+$('#btnResetAdmin').addEventListener('click', resetAdmin);
+$('#loginForm').addEventListener('submit',(e)=>{
+  e.preventDefault(); $('#loginErr').style.display='none';
+  const id=$('#loginId').value.trim(); const pw=$('#loginPass').value;
+
+  ensureAdmin();
+  const users=load(LS_USERS,[]);
+  const u=users.find(x=>x.id===id && x.pass===pw);
+  if(!u){ $('#loginErr').style.display='block'; return; }
+
+  save(LS_SESSION, {id:u.id, role:u.role, name:u.name||u.id});
+
+  // Hap TAB të ri direkt tek banorët
+  const base = location.href.split('#')[0];
+  const target = base + '#/banore';
+  window.open(target, '_blank');
+
+  // Shfaq edhe në këtë tab
+  $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
+  initApp(); location.hash = '#/banore'; router();
+});
+
+$('#logout').addEventListener('click',()=>{ 
+  if(HAS_LS){ localStorage.removeItem(LS_SESSION); } else { delete _mem[LS_SESSION]; }
+  location.reload(); 
+});
+
+/* ===== Router ===== */
+function router(){
+  const s = session();
+  const route = (location.hash || '').replace(/^#\//,'') || 'banore';
+
+  if(!s){
+    $('#login').classList.remove('hidden');
+    $('#app').classList.add('hidden');
+    return;
+  }
+
+  $('#login').classList.add('hidden');
+  $('#app').classList.remove('hidden');
+
+  ['banore','fatura','njoftime'].forEach(id=>$('#'+id).classList.add('hidden'));
+  const target = ['banore','fatura','njoftime'].includes(route) ? route : 'banore';
+  $('#'+target).classList.remove('hidden');
+
+  qa('.tabs .tab').forEach(a=>{
+    const isActive = a.getAttribute('href') === '#/'+target;
+    a.classList.toggle('active', isActive);
+  });
+
+  // Rifresko dropdown-in kur hapet Faturat
+  if(target === 'fatura'){ fillResidentsInSelect(); }
+}
+window.addEventListener('hashchange', router);
+
+/* ===== Helpers ===== */
+function monthNameFromISO(iso){ if(!iso) return ""; const d=new Date(iso); return monthNames[d.getMonth()]||""; }
+function nextInvoiceNumber(){
+  let n = load(LS_COUNTER, 1);
+  const year = new Date().getFullYear();
+  const code = `FAT-${year}-${String(n).padStart(4,'0')}`;
+  save(LS_COUNTER, n+1);
+  return code;
+}
+function getUsers(){ return load(LS_USERS,[]); }
+function saveUsers(arr){ save(LS_USERS,arr); }
+function getBills(){ return load(LS_BILLS,[]); }
+function saveBills(arr){ save(LS_BILLS,arr); }
+function getNotices(){ return load(LS_NOTICES,[]); }
+function saveNotices(arr){ save(LS_NOTICES,arr); }
+function session(){ return load(LS_SESSION,null); }
+
+/* ===== Ndrysho fjalëkalimin tim ===== */
+$('#btnChangePw').addEventListener('click', ()=>{
+  const s=session(); if(!s){ return; }
+  $('#pwCard').classList.toggle('hidden');
+  $('#pwMsg').textContent='';
+  $('#pwForm').reset();
+});
+$('#pwCancel').addEventListener('click', ()=>$('#pwCard').classList.add('hidden'));
+$('#pwForm').addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const s=session(); if(!s){ alert('Session i pavlefshëm.'); return; }
+
+  const cur = $('#pwCurrent').value;
+  const nw  = $('#pwNew').value;
+  const cf  = $('#pwConfirm').value;
+
+  if(nw.length < 4){ $('#pwMsg').textContent='Fjalëkalimi i ri duhet të ketë të paktën 4 karaktere.'; return; }
+  if(nw !== cf){ $('#pwMsg').textContent='Fjalëkalimi i ri nuk përputhet me konfirmimin.'; return; }
+
+  const users = getUsers();
+  const idx = users.findIndex(u => u.id === s.id);
+  if(idx === -1){ $('#pwMsg').textContent='Përdoruesi nuk u gjet.'; return; }
+
+  if(users[idx].pass !== cur){
+    $('#pwMsg').textContent='Fjalëkalimi aktual është i pasaktë.';
+    return;
+  }
+
+  users[idx].pass = nw;
+  saveUsers(users);
+  $('#pwMsg').textContent='U ndryshua me sukses.';
+  setTimeout(()=>$('#pwCard').classList.add('hidden'), 600);
+});
+
+/* ===== Residents UI ===== */
+$('#btnToggleAddResident').addEventListener('click',()=>$('#addResidentCard').classList.toggle('hidden'));
+$('#rCancel').addEventListener('click',()=>$('#addResidentCard').classList.add('hidden'));
+
+$('#residentForm').addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const s=session(); if(!s || s.role!=='admin'){ alert('Vetëm admin mund të shtojë banorë.'); return; }
+  const name=$('#rName').value.trim(), apt=$('#rApt').value.trim(), id=$('#rID').value.trim();
+  const phone=$('#rPhone').value.trim(), wa=$('#rWA').value.trim(), pw=$('#rPW').value;
+  if(!name||!apt||!id||!phone||!pw){ alert('Plotëso të gjitha fushat e detyrueshme.'); return; }
+  const users=getUsers();
+  if(users.some(u=>u.id===id)){ alert('Kjo ID ekziston.'); return; }
+  users.push({id, pass:pw, role:'resident', name, apt, phone, wa});
+  saveUsers(users);
+  e.target.reset(); $('#addResidentCard').classList.add('hidden');
+  drawResidents(); fillResidentsInSelect();
+});
+
+function drawResidents(){
+  const s=session(); const isAdmin=(s&&s.role==='admin');
+  const tb=$('#resTable tbody'); tb.innerHTML='';
+  getUsers().filter(u=>u.role!=='admin').forEach(u=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${u.name||'-'}</td>
+      <td>${u.apt||'-'}</td>
+      <td>${u.phone||'-'} ${u.wa?('<div class="muted">WA: '+u.wa+'</div>'):''}</td>
+      <td>${u.id}</td>
+      <td>
+        ${isAdmin?`
+          <div class="actions">
+            <button class="small btn btn-brand" data-act="edit" data-id="${u.id}">Ndrysho</button>
+            <span class="trash" data-id="${u.id}" title="Fshi">🗑</span>
+          </div>
+        `:'<span class="muted">—</span>'}
+      </td>`;
+    tb.appendChild(tr);
+  });
+  $('#editResidentCard').classList.add('hidden');
+}
+
+$('#resTable').addEventListener('click',(e)=>{
+  const s=session(); if(!s||s.role!=='admin') return;
+
+  const del=e.target.closest('.trash');
+  if(del){
+    const id=del.dataset.id;
+    if(!confirm('Fshi banorin dhe faturat e tij?')) return;
+    saveUsers(getUsers().filter(u=>u.id!==id));
+    saveBills(getBills().filter(b=>b.rid!==id));
+    drawResidents(); drawBills(); fillResidentsInSelect();
+    return;
+  }
+
+  const editBtn = e.target.closest('button[data-act="edit"]');
+  if(editBtn){
+    const id = editBtn.dataset.id;
+    const u = getUsers().find(x=>x.id===id);
+    if(!u) return;
+    $('#eID').value = u.id;
+    $('#eName').value = u.name || '';
+    $('#eApt').value = u.apt || '';
+    $('#ePhone').value = u.phone || '';
+    $('#eWA').value = u.wa || '';
+    $('#ePW').value = '';
+    $('#editResidentCard').classList.remove('hidden');
+  }
+});
+
+$('#eCancel').addEventListener('click',()=>$('#editResidentCard').classList.add('hidden'));
+
+$('#residentEditForm').addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const s=session(); if(!s || s.role!=='admin'){ alert('Vetëm admin.'); return; }
+
+  const id = $('#eID').value;
+  const name = $('#eName').value.trim();
+  const apt = $('#eApt').value.trim();
+  const phone = $('#ePhone').value.trim();
+  const wa = $('#eWA').value.trim();
+  const pw = $('#ePW').value;
+
+  if(!name || !apt || !phone){ alert('Emri, Apt dhe Telefon janë të detyrueshme.'); return; }
+
+  const users = getUsers();
+  const idx = users.findIndex(u=>u.id===id);
+  if(idx===-1){ alert('Banori nuk u gjet.'); return; }
+
+  users[idx].name = name;
+  users[idx].apt = apt;
+  users[idx].phone = phone;
+  users[idx].wa = wa;
+  if(pw) users[idx].pass = pw;
+
+  saveUsers(users);
+
+  // Përditëso faturat me emrin e ri (who)
+  const bills = getBills().map(b => b.rid===id ? {...b, who:name} : b);
+  saveBills(bills);
+
+  $('#editResidentCard').classList.add('hidden');
+  drawResidents(); drawBills(); fillResidentsInSelect();
+  alert('U ruajtën ndryshimet.');
+});
+
+/* === Dropdown i banorëve në Fatura === */
+function fillResidentsInSelect(){
+  const sel = $('#bResident');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">Zgjidh Banorin</option>';
+  getUsers()
+    .filter(u => u.role !== 'admin')
+    .forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = `${u.name || u.id} (${u.id})`;
+      sel.appendChild(opt);
+    });
+}
+
+/* ===== Bills UI ===== */
+$('#btnToggleAddBill').addEventListener('click',()=>$('#addBillCard').classList.toggle('hidden'));
+$('#bCancel').addEventListener('click',()=>$('#addBillCard').classList.add('hidden'));
+
+$('#bDue').addEventListener('change', ()=>{
+  const m=monthNameFromISO($('#bDue').value);
+  $('#bDesc').value = m?`Kjo eshte pagesa e muajit ${m}. Ju faleminderit per korrektesine.`:'';
+});
+$('#bResident').addEventListener('change', ()=>{
+  $('#bTitle').value="Shërbimi i ashensorit dhe pastrimit të pallatit";
+  if(!$('#bDesc').value){ const m=monthNameFromISO($('#bDue').value); if(m) $('#bDesc').value=`Kjo eshte pagesa e muajit ${m}. Ju faleminderit per korrektesine.`; }
+});
+
+$('#billForm').addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const s=session(); if(!s||s.role!=='admin'){ alert('Vetëm admin.'); return; }
+  const rid=$('#bResident').value; if(!rid){ alert('Zgjidh banorin'); return; }
+  const users=getUsers(); const r=users.find(u=>u.id===rid);
+  const due=$('#bDue').value; if(!due){ alert('Vendos datën'); return; }
+  const amount=Number($('#bAmount').value||0);
+  const bill={
+    num: nextInvoiceNumber(),
+    rid,
+    who: r?.name||rid,
+    title: $('#bTitle').value.trim(),
+    desc: $('#bDesc').value.trim() || (monthNameFromISO(due)?`Kjo eshte pagesa e muajit ${monthNameFromISO(due)}. Ju faleminderit per korrektesine.`:''),
+    due,
+    amount,
+    status:'Në pritje'
+  };
+  const arr=getBills(); arr.push(bill); saveBills(arr);
+  e.target.reset(); $('#addBillCard').classList.add('hidden');
+  drawBills();
+});
+
+function drawBills(){
+  const s=session(); 
+  const isAdmin = (s && s.role==='admin');
+
+  const tb=$('#billTable tbody'); 
+  tb.innerHTML='';
+
+  // Admin: të gjitha; Rezident: vetëm të vetat
+  const bills = isAdmin ? getBills() : getBills().filter(b => b.rid === s.id);
+
+  bills.forEach((b,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${b.num}</td>
+      <td>${b.who} <div class="muted">${b.rid}</div></td>
+      <td>${b.title}</td>
+      <td class="muted">${b.desc||''}</td>
+      <td>${b.due}</td>
+      <td>${b.status}</td>
+      <td>
+        ${
+          isAdmin
+          ? `<div class="actions">
+               <button class="small btn" style="background:#25d366;color:#fff" data-act="wa" data-i="${i}">WhatsApp</button>
+               <button class="small btn btn-brand" data-act="toggle" data-i="${i}">Status</button>
+               <button class="small btn btn-grey" data-act="print" data-i="${i}">Print</button>
+               <button class="small btn btn-accent" data-act="pdf" data-i="${i}">PDF</button>
+               <button class="small btn btn-grey" data-act="pdfbw" data-i="${i}">PDF (B/W)</button>
+             </div>`
+          : '<span class="muted">—</span>'
+        }
+      </td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// Veprimet mbi fatura (vetëm admin)
+$('#billTable').addEventListener('click', async (e)=>{
+  const btn=e.target.closest('button[data-act]'); if(!btn) return;
+  const s=session(); if(!s || s.role!=='admin') return;
+
+  const i=Number(btn.dataset.i); const act=btn.dataset.act;
+  const bills=getBills(); const b=bills[i]; const users=getUsers(); const r=users.find(u=>u.id===b.rid);
+
+  if(act==='wa'){
+    const phone=(r?.wa||r?.phone||'').replace(/[^0-9]/g,'');
+    if(!phone){ alert('Nuk ka numër WhatsApp/Telefon tek ky banor.'); return; }
+    const msg=`Pershendetje ${b.who},%0A%0AFatura ${b.num} — ${b.title}.%0A${b.desc?b.desc+'%0A':''}Shuma: ALL ${Number(b.amount).toLocaleString('sq-AL')}.%0AAfati: ${b.due}.%0AFaleminderit per korrektesine.`;
+    window.open('https://wa.me/'+phone+'?text='+msg,'_blank');
+  }
+  if(act==='toggle'){
+    bills[i].status = (b.status==='Paguar' || b.status==='paid') ? 'Në pritje' : 'Paguar';
+    saveBills(bills); drawBills();
+  }
+  if(act==='print'){
+    const html=invoiceHTML(b,r,false); const w=window.open('','_blank'); w.document.write(html); w.document.close(); w.focus(); setTimeout(()=>w.print(),300);
+  }
+  if(act==='pdf'){
+    await downloadPDF(b,r,false);
+  }
+  if(act==='pdfbw'){
+    await downloadPDF(b,r,true);
+  }
+});
+
+/* ===== Njoftimet ===== */
+$('#btnToggleAddNotice').addEventListener('click',()=>{
+  const s=session(); $('#addNoticeCard').classList.toggle('hidden', !(s&&s.role==='admin'));
+});
+$('#nCancel').addEventListener('click',()=>$('#addNoticeCard').classList.add('hidden'));
+$('#noticeForm').addEventListener('submit', async (e)=>{
+  e.preventDefault(); const s=session(); if(!s||s.role!=='admin'){ alert('Vetëm admin shton njoftime.'); return; }
+  const title=$('#nTitle').value.trim(); if(!title){ alert('Titulli?'); return; }
+  let img=''; const f=$('#nImg').files?.[0];
+  if(f){ img=await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(f); }); }
+  const body=$('#nBody').value.trim();
+  const arr=getNotices(); arr.unshift({id:'n'+Date.now(),title,body,img,ts:Date.now()}); saveNotices(arr);
+  e.target.reset(); $('#addNoticeCard').classList.add('hidden'); drawNotices();
+});
+function drawNotices(){
+  const list=$('#noticeList'); list.innerHTML='';
+  getNotices().forEach(n=>{
+    const when=new Date(n.ts).toLocaleString('sq-AL');
+    const box=document.createElement('div'); box.className='card pad'; box.style.marginBottom='10px';
+    box.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:800">${n.title}</div><div class="muted" style="font-size:12px">${when}</div></div>
+                   ${n.img?`<img src="${n.img}" style="max-width:100%;border-radius:12px;border:1px solid #eef2f7;margin-top:8px">`:''}
+                   ${n.body?`<div class="muted" style="margin-top:8px">${n.body.replaceAll('\n','<br>')}</div>`:''}`;
+    list.appendChild(box);
+  });
+}
+
+/* ===== Fatura: Print & PDF ===== */
+function invoiceCSS(bw=false){
+  if(bw){
+    return `<style>
+      *{color:#000 !important}
+      body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:0}
+      .inv{max-width:800px;margin:0 auto;padding:28px}
+      .brand{height:6px;background:#000;border-radius:3px;margin-bottom:16px}
+      .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+      .logo{max-height:54px;filter:grayscale(1) contrast(1.4)}
+      .title{font-size:24px;font-weight:900;letter-spacing:.3px}
+      .muted{color:#000 !important}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+      .box{border:2px solid #000;border-radius:12px;padding:12px}
+      table{width:100%;border-collapse:collapse;margin-top:8px}
+      th,td{padding:12px;border-bottom:2px solid #000;text-align:left}
+      thead th{font-weight:800}
+      .right{text-align:right}
+      .total-row td{font-weight:900;border-top:3px solid #000}
+      .foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+      .thanks{border:2px solid #000;padding:8px 12px;border-radius:10px;font-weight:700}
+      .no-print{display:inline-block;margin-top:10px;padding:8px 12px;border:2px solid #000;border-radius:10px;background:#fff;cursor:pointer}
+      @media print {.no-print{display:none}}
+    </style>`;
+  }
+  return `<style>
+    body{font-family:system-ui,Segoe UI,Roboto,Arial;color:#0f172a;margin:0}
+    .inv{max-width:800px;margin:0 auto;padding:28px}
+    .brand{background:linear-gradient(135deg,#0ea5e9,#10b981);height:6px;border-radius:3px;margin-bottom:16px}
+    .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .logo{max-height:54px}
+    .title{font-size:24px;font-weight:900;letter-spacing:.3px}
+    .muted{color:#64748b}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+    .box{border:1px solid #e5e7eb;border-radius:12px;padding:12px}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:12px;border-bottom:1px solid #eef2f7;text-align:left}
+    thead th{background:#f8fafc;color:#64748b;text-transform:uppercase;font-size:12px}
+    .right{text-align:right}
+    .total-row td{font-weight:900}
+    .foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+    .thanks{color:#065f46;background:#ecfdf5;border:1px solid #a7f3d0;padding:8px 12px;border-radius:10px}
+    .no-print{display:inline-block;margin-top:10px;padding:8px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#f8fafc;cursor:pointer}
+    @media print {.no-print{display:none}}
+  </style>`;
+}
+function invoiceInner(b,r,bw=false){
+  const status=(b.status==='Paguar' || b.status==='paid')?'Paguar':'Në pritje';
+  return `
+    <div class="brand"></div>
+    <div class="hdr">
+      <div>
+        <div class="title">FATURË</div>
+        <div class="muted">Numri: ${b.num}</div>
+      </div>
+      <img class="logo" src="https://i.postimg.cc/Pf01SyBG/LEONARD-LOGO.png" alt="Logo">
+    </div>
+
+    <div class="grid">
+      <div class="box">
+        <div style="font-weight:800;margin-bottom:4px">Dërguesi</div>
+        <div>Administrata e Pallatit</div>
+        ${bw ? '' : '<div class="muted">Shërbimi i ashensorit dhe pastrimit</div>'}
+      </div>
+      <div class="box">
+        <div style="font-weight:800;margin-bottom:4px">Për</div>
+        <div>${b.who||'-'} ${r?.apt?(' • Apt '+r.apt):''}</div>
+        <div class="muted">${r?.id?('ID '+r.id):''} ${r?.phone?(' • Tel '+r.phone):''} ${r?.wa?(' • WA '+r.wa):''}</div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Përshkrimi</th><th class="right">Shuma</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>${b.title}</b>${b.desc?('<div class="'+(bw?'':'muted')+'">'+b.desc+'</div>'):''}</td>
+          <td class="right">ALL ${Number(b.amount||0).toLocaleString('sq-AL')}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="total-row"><td>Totali</td><td class="right">ALL ${Number(b.amount||0).toLocaleString('sq-AL')}</td></tr>
+      </tfoot>
+    </table>
+
+    <div class="foot">
+      <div>
+        <span style="font-weight:700;color:#000">Afati: ${b.due}</span>
+        <span style="font-weight:700;color:#000;margin-left:8px">Statusi: ${status}</span>
+      </div>
+      <div class="thanks">${bw?'Faleminderit!':'Faleminderit për korrektësinë!'}</div>
+    </div>
+
+    <button class="no-print" onclick="window.print()">Printo</button>
+  `;
+}
+function invoiceHTML(b,r,bw=false){
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${b.num}</title>${invoiceCSS(bw)}</head><body><div class="inv">${invoiceInner(b,r,bw)}</div></body></html>`;
+}
+async function downloadPDF(b,r,bw=false){
+  const { jsPDF } = window.jspdf;
+  const wrap=document.createElement('div');
+  wrap.innerHTML=invoiceCSS(bw)+`<div class="inv">${invoiceInner(b,r,bw)}</div>`;
+  wrap.style.width='794px'; document.body.appendChild(wrap);
+  const doc=new jsPDF('p','pt','a4');
+  await doc.html(wrap,{
+    x:24,y:24,
+    html2canvas:{scale:0.95,windowWidth:794},
+    callback:(d)=>{ d.save(`Fature_${b.num}${bw?'_BW':''}.pdf`); document.body.removeChild(wrap); }
+  });
+}
+
+/* ===== Boot ===== */
+function initApp(){
+  const s=session(); if(!s) return;
+  $('#role').textContent=s.role; $('#who').textContent=s.name||s.id;
+
+  const isAdmin=(s.role==='admin');
+  if(isAdmin){ qa('.admin-gate').forEach(el=>el.classList.remove('admin-gate')); }
+
+  // form njoftimesh mbyllur
+  $('#addNoticeCard').classList.add('hidden');
+
+  drawResidents();
+  fillResidentsInSelect();
+  drawBills();
+  drawNotices();
+}
+(function(){
+  ensureAdmin();
+  const s=session();
+  if(s){
+    $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
+    initApp();
+    if(!location.hash) location.hash = '#/banore';
+    router();
+  }else{
+    router();
+  }
+})();
+</script>
+</body>
+</html>
