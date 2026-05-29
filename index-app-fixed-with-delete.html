@@ -1,772 +1,558 @@
 <!DOCTYPE html>
 <html lang="sq">
 <head>
-  <meta charset="UTF-8" />
-  <title>Pallati — Banorë, Faturat, Njoftime</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
-  <style>
-    :root{
-      --bg:#f6f7fb; --text:#0f172a; --muted:#64748b; --ring:#e5e7eb;
-      --brand:#4f46e5; --accent:#10b981; --warn:#f59e0b; --danger:#dc2626;
-      --card:#fff;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(135deg,#0ea5e9,#10b981);min-height:100vh;color:var(--text)}
-    .wrap{max-width:1100px;margin:0 auto}
-    .hidden{display:none}
-    .muted{color:var(--muted)}
-    .card{background:var(--card);border:1px solid var(--ring);border-radius:16px;box-shadow:0 8px 24px rgba(2,6,23,.10)}
-    .pad{padding:16px}
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:0;border-radius:12px;cursor:pointer;font-weight:700}
-    .btn-brand{background:var(--brand);color:#fff}
-    .btn-accent{background:var(--accent);color:#fff}
-    .btn-grey{background:#e5e7eb;color:#111827}
-    .btn-red{background:var(--danger);color:#fff}
-    .input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:12px;background:#fff;outline:none}
-    .input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(79,70,229,.2);border-color:var(--brand)}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:12px 14px;border-bottom:1px solid #eef2f7;vertical-align:top}
-    thead th{font-size:12px;text-transform:uppercase;color:#64748b;background:#f8fafc}
-    .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .small{padding:6px 10px;border-radius:10px;font-size:12px}
-    .trash{cursor:pointer;color:var(--danger);font-size:18px}
-    header.top{background:#fff}
-    header .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px}
-    .badge{background:#0f172a;color:#fff;border-radius:999px;padding:6px 10px;font-size:12px}
-    .pill{background:#eef2f7;border-radius:999px;padding:6px 10px;font-size:12px}
-    .tabs{display:flex;gap:16px;border-bottom:1px solid var(--ring);padding:0 16px;background:#fff}
-    .tab{background:none;border:0;padding:12px 6px;margin-bottom:-1px;border-bottom:2px solid transparent;color:#475569;cursor:pointer;text-decoration:none}
-    .tab.active{border-color:var(--brand);color:var(--brand);font-weight:700}
-    main{background:#fff;border-top:1px solid var(--ring);border-bottom:1px solid var(--ring)}
-    /* Login */
-    #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-    .login-card{width:100%;max-width:420px}
-    .login-logo{display:block;margin:6px auto 10px;max-width:180px}
-    /* Admin gate: default fshehur, shfaqet vetëm për admin */
-    .admin-gate{display:none!important}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Me mësues Dorin - Asistencë Akademike</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        
+        .no-copy { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 50%, #fff9f5 100%); }
+        
+        /* Modal Stilet */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(8px); }
+        .modal-content { background-color: white; margin: 2% auto; padding: 30px; border-radius: 24px; max-width: 950px; width: 95%; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); max-height: 90vh; overflow-y: auto; }
+
+        /* Tabela origjinale e ditarit */
+        .diary-table { width: 100%; border-collapse: collapse; font-family: 'Times New Roman', serif; color: black; margin-top: 10px; }
+        .diary-table td { border: 1px solid black; padding: 10px; vertical-align: top; font-size: 10pt; line-height: 1.4; }
+        .bg-gray { background-color: #f2f2f2; font-weight: bold; text-align: center; text-transform: uppercase; }
+        .bold { font-weight: bold; }
+        .italic { font-style: italic; }
+        
+        .logo-img { width: 80px; height: 80px; object-fit: contain; border-radius: 12px; }
+        .dropdown-select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
+    </style>
 </head>
-<body>
+<body class="text-gray-800 no-copy">
 
-<!-- LOGIN -->
-<section id="login">
-  <div class="login-card card pad">
-    <img class="login-logo" src="https://i.postimg.cc/Pf01SyBG/LEONARD-LOGO.png" alt="Logo">
-    <h2 style="margin:0 0 6px;text-align:center">Hyrje</h2>
-    <div class="muted" style="text-align:center">Default: <b>admin</b> / <b>admin</b></div>
-    <form id="loginForm" style="margin-top:10px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <input id="loginId" class="input" placeholder="ID" required>
-        <input id="loginPass" class="input" type="password" placeholder="Password" required>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="btn btn-brand" style="flex:1" type="submit">Hyr</button>
-        <button id="btnResetAdmin" class="btn btn-grey" style="flex:1" type="button">Reset Admin</button>
-      </div>
-      <div id="loginErr" class="muted" style="color:#dc2626;display:none;margin-top:8px">Kredencialet e pasakta.</div>
-    </form>
-  </div>
-</section>
-
-<!-- APP -->
-<section id="app" class="hidden">
-  <header class="top">
-    <div class="wrap">
-      <div class="row">
-        <div style="display:flex;align-items:center;gap:10px">
-          <h2 style="margin:0">Menaxhimi i Pallatit</h2>
-          <span id="role" class="badge">—</span>
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-blue-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="Kurse Kleo-Arti.jpg" alt="Mësues Dori" class="w-12 h-12 rounded-full border-2 border-blue-600 object-cover object-top shadow-md">
+                <div>
+                    <h1 class="text-2xl font-black text-blue-700 uppercase tracking-tighter italic leading-none">Me mësues Dorin</h1>
+                    <p class="text-[11px] text-gray-500 font-medium mt-1">
+                        <i class="fa-solid fa-eye text-blue-500 mr-1"></i> Ti je vizitori i: 
+                        <span id="counter" class="bg-blue-50 text-blue-700 font-bold px-1.5 py-0.5 rounded border border-blue-100">500</span>
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-wrap justify-center items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-500">
+                <a href="#rreth-nesh" class="hover:text-orange-500 transition px-2">Rreth nesh</a>
+                <a href="#sherbimet" class="hover:text-orange-500 transition px-2">Shërbimet</a>
+                <a href="#ditar-shembuj" class="hover:text-blue-700 transition px-2 font-black">Ditarët</a>
+                <a href="#kontakti" class="hover:text-orange-500 transition px-2">Kontakti</a>
+            </div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <span id="who" class="pill">—</span>
-          <button id="btnChangePw" class="btn btn-grey">Ndrysho Fjalëkalimin</button>
-          <button id="logout" class="btn btn-red">Dil</button>
-        </div>
-      </div>
-    </div>
-    <nav class="tabs">
-      <div class="wrap" style="display:flex;gap:16px">
-        <a class="tab" href="#/banore">Banorët</a>
-        <a class="tab" href="#/fatura">Faturat</a>
-        <a class="tab" href="#/njoftime">Njoftimet</a>
-      </div>
     </nav>
-  </header>
 
-  <main>
-    <div class="wrap" style="padding:16px">
-
-      <!-- Karta: Ndrysho fjalëkalimin -->
-      <div id="pwCard" class="card pad hidden" style="max-width:600px;margin:0 auto 16px;background:#fffafc">
-        <h3 style="margin-top:0">Ndrysho fjalëkalimin</h3>
-        <form id="pwForm" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <input id="pwCurrent" class="input" type="password" placeholder="Fjalëkalimi aktual" required>
-          <div></div>
-          <input id="pwNew" class="input" type="password" placeholder="Fjalëkalimi i ri" required>
-          <input id="pwConfirm" class="input" type="password" placeholder="Përsërit fjalëkalimin e ri" required>
-          <div style="grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
-            <button class="btn btn-accent" type="submit">Ruaj</button>
-            <button id="pwCancel" class="btn btn-grey" type="button">Mbyll</button>
-          </div>
-        </form>
-        <div id="pwMsg" class="muted" style="margin-top:6px"></div>
-      </div>
-
-      <!-- BANORËT -->
-      <section id="banore">
-        <div class="card pad" style="margin-bottom:12px">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <h3 style="margin:0">Banorët</h3>
-            <button id="btnToggleAddResident" class="btn btn-brand admin-gate">Shto Banor</button>
-          </div>
-
-          <!-- Forma Shto Banor (vetëm admin) -->
-          <div id="addResidentCard" class="card pad admin-gate hidden" style="margin-top:12px;background:#fbfdff">
-            <form id="residentForm" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-              <input id="rName" class="input" placeholder="Emri i plotë" required>
-              <input id="rApt" class="input" placeholder="Apt" required>
-              <input id="rID" class="input" placeholder="ID (p.sh. hyrja)" required>
-              <input id="rPhone" class="input" placeholder="Telefon" required>
-              <input id="rWA" class="input" placeholder="WhatsApp (ops.)">
-              <input id="rPW" class="input" placeholder="Password fillestar" required>
-              <div style="grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end">
-                <button class="btn btn-accent" type="submit">Ruaj banorin</button>
-                <button id="rCancel" class="btn btn-grey" type="button">Anulo</button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Forma Ndrysho Banor (vetëm admin) -->
-          <div id="editResidentCard" class="card pad admin-gate hidden" style="margin-top:12px;background:#fffaf0">
-            <form id="residentEditForm" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-              <input id="eID" class="input" placeholder="ID" disabled>
-              <input id="eName" class="input" placeholder="Emri i plotë" required>
-              <input id="eApt" class="input" placeholder="Apt" required>
-              <input id="ePhone" class="input" placeholder="Telefon" required>
-              <input id="eWA" class="input" placeholder="WhatsApp (ops.)">
-              <input id="ePW" class="input" placeholder="Fjalëkalim (lëre bosh për pa ndryshim)">
-              <div style="grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end">
-                <button class="btn btn-accent" type="submit">Ruaj ndryshimet</button>
-                <button id="eCancel" class="btn btn-grey" type="button">Mbyll</button>
-              </div>
-            </form>
-          </div>
+    <header id="rreth-nesh" class="py-16 md:py-24">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center gap-12 text-center md:text-left">
+            <div class="flex-1">
+                <p class="text-orange-500 font-black tracking-[0.3em] uppercase text-xs mb-4 italic">ASISTENCË PROFESIONALE</p>
+                <h2 class="text-5xl md:text-7xl font-extrabold mb-8 leading-tight text-slate-900 uppercase tracking-tighter">Dokumentacioni <br> juaj akademik</h2>
+                <a href="#sherbimet" class="bg-orange-500 text-white px-10 py-4 rounded-2xl font-bold shadow-xl hover:bg-orange-600 transition inline-block uppercase text-sm tracking-widest">Shiko Shërbimet</a>
+            </div>
+            <div class="flex-1 w-full">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1260&h=750&q=80" alt="Asistencë Akademike dhe Shërbime Digjitale" class="rounded-[2.5rem] shadow-2xl w-full max-w-[500px] h-[350px] object-cover border-[10px] border-white mx-auto">
+            </div>
         </div>
+    </header>
 
-        <div class="card pad">
-          <div style="overflow:auto">
-            <table id="resTable">
-              <thead><tr><th>Emri</th><th>Apt</th><th>Kontakt</th><th>ID</th><th>Veprime</th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
+    <section id="perse-ne" class="py-12 bg-transparent">
+        <div class="max-w-4xl mx-auto px-4">
+            <div id="faq-container" class="bg-white rounded-[2.5rem] border border-orange-100 shadow-xl overflow-hidden cursor-pointer transition-all duration-300">
+                <div id="faq-header" class="flex justify-between items-center p-8">
+                    <h3 class="text-3xl font-black text-slate-800 uppercase tracking-tight italic">Përse të na zgjidhni ne?</h3>
+                    <div id="faq-icon" class="text-orange-500 text-2xl transition-transform"><i class="fa-solid fa-circle-chevron-down"></i></div>
+                </div>
+                <div id="faq-content" class="hidden px-8 pb-10 text-slate-600 border-t border-orange-50 pt-8">
+                    <div class="grid md:grid-cols-2 gap-6 text-sm font-medium italic">
+                        <div class="bg-orange-50 p-5 rounded-2xl"><b>Saktësi MAS & ASCAP:</b> Hartim sipas udhëzimeve zyrtare 2026.</div>
+                        <div class="bg-blue-50 p-5 rounded-2xl"><b>Diferencim & AK:</b> Strategji specifike për PEI dhe nxënësit e shkëlqyer.</div>
+                        <div class="bg-green-50 p-5 rounded-2xl"><b>Kursim Kohe:</b> Ne eliminojmë stresin administrativ për ju.</div>
+                        <div class="bg-purple-50 p-5 rounded-2xl"><b>Inovacion Digjital:</b> Punime Canva, editim videosh dhe menaxhim akustik.</div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </section>
+    </section>
 
-      <!-- FATURAT -->
-      <section id="fatura" class="hidden">
-        <div class="card pad" style="margin-bottom:12px">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <h3 style="margin:0">Faturat</h3>
-            <button id="btnToggleAddBill" class="btn btn-brand admin-gate">Shto Faturë</button>
-          </div>
-
-          <!-- Forma Shto Faturë (vetëm admin) -->
-          <div id="addBillCard" class="card pad admin-gate hidden" style="margin-top:12px;background:#fbfdff">
-            <form id="billForm">
-              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px">
-                <select id="bResident" class="input" required></select>
-                <input id="bTitle" class="input" value="Shërbimi i ashensorit dhe pastrimit të pallatit" required>
-                <input id="bAmount" class="input" type="number" step="0.01" value="1000" required>
-                <input id="bDue" class="input" type="date" required>
-              </div>
-              <textarea id="bDesc" class="input" rows="3" placeholder="Përshkrimi"></textarea>
-              <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
-                <button class="btn btn-accent" type="submit">Ruaj faturën</button>
-                <button id="bCancel" class="btn btn-grey" type="button">Anulo</button>
-              </div>
-            </form>
-          </div>
+    <section id="ditar-shembuj" class="py-20 bg-white/50 border-y border-blue-50 text-center">
+        <h3 class="text-4xl font-black mb-12 uppercase tracking-tighter text-slate-900 italic">Ditar Shembuj</h3>
+        <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-4">
+            <div class="bg-white p-8 rounded-3xl shadow-lg border border-blue-100 flex flex-col items-center">
+                <i class="fa-solid fa-people-group text-4xl text-sky-500 mb-6"></i>
+                <h4 class="text-lg font-bold mb-4 uppercase italic">Lëndët Shoqërore</h4>
+                <select id="lendaShoqerore" onchange="handleSelection('lendaShoqerore')" class="dropdown-select w-full bg-slate-50 border border-blue-100 py-4 px-6 rounded-2xl font-bold italic transition">
+                    <option value="">-- Zgjidh Lëndën --</option>
+                    <option value="shqipe">Gjuhë Shqipe</option>
+                    <option value="histori">Histori</option>
+                    <option value="gjeografi">Gjeografi</option>
+                    <option value="qytetari">Qytetari</option>
+                    <option value="sociologji">Sociologji</option>
+                </select>
+            </div>
+            <div class="bg-white p-8 rounded-3xl shadow-lg border border-orange-100 flex flex-col items-center">
+                <i class="fa-solid fa-flask-vial text-4xl text-orange-500 mb-6"></i>
+                <h4 class="text-lg font-bold mb-4 uppercase italic">Lëndët Shkencore</h4>
+                <select id="lendaShkencore" onchange="handleSelection('lendaShkencore')" class="dropdown-select w-full bg-slate-50 border border-orange-100 py-4 px-6 rounded-2xl font-bold italic transition">
+                    <option value="">-- Zgjidh Lëndën --</option>
+                    <option value="matematike">Matematikë</option>
+                    <option value="fizike">Fizikë</option>
+                    <option value="biologji">Biologji</option>
+                    <option value="kimi">Kimi</option>
+                    <option value="tik">TIK</option>
+                </select>
+            </div>
         </div>
+    </section>
 
-        <div class="card pad">
-          <div style="overflow:auto">
-            <table id="billTable">
-              <thead>
-                <tr>
-                  <th>Nr. Fature</th><th>Banori</th><th>Titulli</th><th>Përshkrimi</th><th>Afati</th><th>Status</th><th>Veprime</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+    <section id="sherbimet" class="py-24 max-w-[90rem] mx-auto px-4 text-center">
+        <h3 class="text-4xl font-black mb-16 uppercase tracking-tighter text-slate-900 italic">Shërbimet tona profesionale</h3>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-start">
+            
+            <div class="bg-white p-6 rounded-[2rem] shadow-xl border border-slate-50 h-full flex flex-col justify-between">
+                <div>
+                    <i class="fa-solid fa-laptop-code text-5xl text-orange-500 mb-6"></i>
+                    <h4 class="text-xl font-black mb-2 uppercase italic">SMIP</h4>
+                </div>
+                <div class="flex flex-col gap-4 mt-6">
+                    <button onclick="showImage('https://www.portalishkollor.al/upload/media/entries/2025-08/27/8146-0-00c3d4dd9ce738833b4b9f40e88b2184.jpg')" class="w-full py-4 bg-orange-50 hover:bg-orange-100 text-orange-700 font-bold rounded-2xl text-xs italic uppercase transition">1. Mirembajtja e SMIP</button>
+                    <button onclick="showText('SMIP: Hedhja e notave', 'Hedhja e notave me saktësi maksimale sipas periudhave.')" class="w-full py-4 bg-orange-50 hover:bg-orange-100 text-orange-700 font-bold rounded-2xl text-xs italic uppercase transition">2. Hedhja e notave</button>
+                </div>
+            </div>
+            
+            <div class="bg-sky-600 p-6 rounded-[2rem] shadow-2xl text-white h-full flex flex-col justify-between">
+                <div>
+                    <i class="fa-solid fa-file-invoice text-5xl mb-6"></i>
+                    <h4 class="text-xl font-black mb-2 uppercase">ASCAP</h4>
+                </div>
+                <div class="flex flex-col gap-4 mt-6">
+                    <button onclick="showText('Planet vjetore', 'Hartimi i planeve vjetore.')" class="w-full py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl text-xs italic uppercase transition">1. Planet vjetore</button>
+                    <button onclick="showText('Planet ditore', 'Përgatitja e ditarëve ditorë.')" class="w-full py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl text-xs italic uppercase transition">2. Planet ditore</button>
+                    <button onclick="showText('Teste me çeles & Blu print', 'Teste të periudhave me nivele.')" class="w-full py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl text-xs italic uppercase transition">3. Teste të periudhave</button>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-[2rem] shadow-xl border border-slate-50 h-full flex flex-col justify-between">
+                <div>
+                    <i class="fa-solid fa-award text-5xl text-orange-500 mb-6"></i>
+                    <h4 class="text-xl font-black mb-2 uppercase italic">Kualifikimi</h4>
+                </div>
+                <div class="flex flex-col gap-2 mt-6">
+                    <button onclick="showText('Projekte', 'Hartimi i projekteve lëndore dhe nderlendore.')" class="w-full py-3 bg-orange-50 hover:bg-orange-100 text-orange-700 font-bold rounded-xl text-xs italic uppercase transition">1. Projekte lëndore</button>
+                    <button onclick="showText('Canva', 'Prezantime moderne për orët e hapura. Certifikata per evente. Kartvizita. Modifikime fotografiash. ')" class="w-full py-3 bg-orange-50 hover:bg-orange-100 text-orange-700 font-bold rounded-xl text-xs italic uppercase transition">2. Punime Canva</button>
+                    <button onclick="showText('Video', 'Editim profesional i videove shkollore.')" class="w-full py-3 bg-orange-50 hover:bg-orange-100 text-orange-700 font-bold rounded-xl text-xs italic uppercase transition">3. Editim Videosh</button>
+                </div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-[2rem] shadow-2xl text-white h-full flex flex-col justify-between border border-slate-700">
+                <div>
+                    <i class="fa-solid fa-compact-disc text-5xl text-orange-400 mb-6 animate-spin" style="animation-duration: 4s;"></i>
+                    <h4 class="text-xl font-black mb-1 uppercase italic text-orange-400">DJ Evente</h4>
+                    <span class="text-[11px] bg-orange-500/20 text-orange-300 px-3 py-1 rounded-full border border-orange-500/30 font-bold tracking-wider inline-block mb-2">Çmim oferte për shkollat</span>
+                </div>
+                <div class="flex flex-col gap-3 mt-4">
+                    <button onclick="showText('Mbrëmje Festive', 'Organizim dhe mbulim muzikor profesional për mbrëmjet e maturës, festat e fundvitit dhe eventet e shkollës. Gjithcka gjysem cmimi')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs italic uppercase transition">1. Mbrëmje Mature & Festa</button>
+                    <button onclick="showText('Konkurse & Aktivitet', 'Menaxhim audio profesional për pasarelave, konkurseve të talenteve, orëve të hapura dhe aktiviteteve sportive .')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs italic uppercase transition">2. Aktivitete & Show</button>
+                    <button onclick="showText('Rregjistrime Vokali', 'Me projektin home-studio vijme aty ku jeni dhe ju bejme Cover te kenges qe ju deshironi.')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs italic uppercase transition">3. Home-studio</button>
+                </div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-[2rem] shadow-2xl text-white h-full flex flex-col justify-between border border-slate-700">
+                <div>
+                    <i class="fa-solid fa-ellipsis-h text-5xl text-orange-400 mb-6"></i>
+                    <h4 class="text-xl font-black mb-2 uppercase italic text-orange-400">Shërbime të tjera</h4>
+                </div>
+                <div class="flex flex-col gap-3 mt-6">
+                    <button onclick="showText('Kthim dokumentash nga shkrim me dore ne kompjuter.', 'Nese keni nje liber apo nje dokument qe do ta kthesh nga shkrimi me dore ne kompjuter ne e kthjejme pa problem')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs italic uppercase transition">1. Transkriptime</button>
+                    <button onclick="showText('Word to PDF', 'Kthejme dokumenta nga word ne PDF dhen anasjelltas.')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs italic uppercase transition">2. Word / PDF</button>
+                    <button onclick="showText('Formatim komjuterash', 'Bejme formatim kompjuterash dhen lap-topash duke ruajtur me shume profesionalizem te gjitha dokumentet dhen instalim te programeve te updetuara.')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs italic uppercase transition">3. Formatim Kompjuterash</button>
+                </div>
+            </div>
+
         </div>
-      </section>
+    </section>
 
-      <!-- NJOFTIMET -->
-      <section id="njoftime" class="hidden">
-        <div class="card pad" style="margin-bottom:12px">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <h3 style="margin:0">Njoftimet</h3>
-            <button id="btnToggleAddNotice" class="btn btn-brand admin-gate">Shto Njoftim</button>
-          </div>
-
-          <!-- Forma Shto Njoftim (vetëm admin) -->
-          <div id="addNoticeCard" class="card pad admin-gate hidden" style="margin-top:12px;background:#fbfdff">
-            <form id="noticeForm">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-                <input id="nTitle" class="input" placeholder="Titulli" required>
-                <input id="nImg" class="input" type="file" accept="image/*">
-              </div>
-              <textarea id="nBody" class="input" rows="3" placeholder="Përshkrimi"></textarea>
-              <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
-                <button class="btn btn-accent" type="submit">Ruaj njoftimin</button>
-                <button id="nCancel" class="btn btn-grey" type="button">Anulo</button>
-              </div>
-            </form>
-          </div>
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle" class="text-2xl font-black text-blue-700 uppercase mb-6 text-center italic border-b pb-4">Detajet</h2>
+            <div id="modalBody" class="text-slate-600 mb-6 overflow-x-auto"></div>
+            <div class="text-center"><button onclick="closeModal()" class="bg-slate-900 text-white px-10 py-3 rounded-xl font-bold uppercase tracking-widest text-xs">Mbyll</button></div>
         </div>
-
-        <div class="card pad" id="noticeList"></div>
-      </section>
-
     </div>
-  </main>
-</section>
 
-<script>
-/* ===== Persistim me localStorage (me fallback) ===== */
-const LS_USERS='pal_users_v4';
-const LS_SESSION='pal_session_v4';
-const LS_BILLS='pal_bills_v4';
-const LS_NOTICES='pal_notices_v4';
-const LS_COUNTER='pal_inv_counter_v4';
+    <section id="kontakti" class="py-24 bg-slate-900 text-white text-center">
+        <h3 class="text-4xl font-black mb-8 italic uppercase tracking-tighter">Nisni bashkëpunimin sot</h3>
+        <a href="https://wa.me/355695258165" target="_blank" class="bg-green-500 px-14 py-5 rounded-2xl font-black inline-flex items-center gap-4 hover:bg-green-600 transition shadow-2xl uppercase tracking-widest"><i class="fa-brands fa-whatsapp text-3xl"></i> WhatsApp</a>
+        <p class="text-xl font-light text-sky-400 mt-8 italic">dorianismaili81@gmail.com</p>
+    </section>
 
-const $=(s,r=document)=>r.querySelector(s);
-const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-const monthNames=["Janar","Shkurt","Mars","Prill","Maj","Qershor","Korrik","Gusht","Shtator","Tetor","Nëntor","Dhjetor"];
+    <script>
+        // Logjika e Numëruesit të vizitorëve (Fillimi nga 500)
+        document.addEventListener("DOMContentLoaded", () => {
+            let count = localStorage.getItem("page_view_counter");
+            if (!count) {
+                count = 500;
+            } else {
+                count = parseInt(count) + 1;
+            }
+            localStorage.setItem("page_view_counter", count);
+            document.getElementById("counter").innerText = count;
+        });
 
-function storageAvailable(){ try{ const k="__t"; localStorage.setItem(k,"1"); localStorage.removeItem(k); return true; }catch(e){ return false; } }
-const HAS_LS = storageAvailable();
-const _mem = {};
-function load(k,d){ try{ if(HAS_LS){ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); } else { return k in _mem?_mem[k]:d; } }catch(e){ return d; } }
-function save(k,v){ try{ if(HAS_LS){ localStorage.setItem(k, JSON.stringify(v)); } else { _mem[k]=v; } }catch(e){ _mem[k]=v; } }
+        const modal = document.getElementById('infoModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const faqContainer = document.getElementById('faq-container');
+        const faqContent = document.getElementById('faq-content');
+        const faqIcon = document.getElementById('faq-icon');
 
-/* ===== Admin default + Reset ===== */
-function ensureAdmin(force=false){
-  let users = load(LS_USERS, []);
-  const adminObj = { id:'admin', pass:'admin', role:'admin', name:'Administrator' };
-  const i = users.findIndex(u => u.id === 'admin');
-  if(i === -1){ users.push(adminObj); }
-  else if(force){ users[i] = adminObj; }
-  save(LS_USERS, users);
-}
-function resetAdmin(){
-  try{
-    if(HAS_LS){
-      [LS_USERS,LS_SESSION,LS_BILLS,LS_NOTICES,LS_COUNTER].forEach(k=>localStorage.removeItem(k));
-    }else{
-      [LS_USERS,LS_SESSION,LS_BILLS,LS_NOTICES,LS_COUNTER].forEach(k=>{ delete _mem[k]; });
-    }
-  }catch{}
-  ensureAdmin(true);
-  alert('U rivendos admin/admin. Po rifreskoj faqen…');
-  location.reload();
-}
+        // HOVER FAQ
+        faqContainer.addEventListener('mouseenter', () => { faqContent.style.display = 'block'; faqIcon.style.transform = "rotate(180deg)"; });
+        faqContainer.addEventListener('mouseleave', () => { faqContent.style.display = 'none'; faqIcon.style.transform = "rotate(0deg)"; });
 
-/* ===== Login: hap tab të ri pas suksesit ===== */
-$('#btnResetAdmin').addEventListener('click', resetAdmin);
-$('#loginForm').addEventListener('submit',(e)=>{
-  e.preventDefault(); $('#loginErr').style.display='none';
-  const id=$('#loginId').value.trim(); const pw=$('#loginPass').value;
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function(e) { if (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 85 || e.keyCode === 83)) return false; };
 
-  ensureAdmin();
-  const users=load(LS_USERS,[]);
-  const u=users.find(x=>x.id===id && x.pass===pw);
-  if(!u){ $('#loginErr').style.display='block'; return; }
-
-  save(LS_SESSION, {id:u.id, role:u.role, name:u.name||u.id});
-
-  // Hap TAB të ri direkt tek banorët
-  const base = location.href.split('#')[0];
-  const target = base + '#/banore';
-  window.open(target, '_blank');
-
-  // Shfaq edhe në këtë tab
-  $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
-  initApp(); location.hash = '#/banore'; router();
-});
-
-$('#logout').addEventListener('click',()=>{ 
-  if(HAS_LS){ localStorage.removeItem(LS_SESSION); } else { delete _mem[LS_SESSION]; }
-  location.reload(); 
-});
-
-/* ===== Router ===== */
-function router(){
-  const s = session();
-  const route = (location.hash || '').replace(/^#\//,'') || 'banore';
-
-  if(!s){
-    $('#login').classList.remove('hidden');
-    $('#app').classList.add('hidden');
-    return;
-  }
-
-  $('#login').classList.add('hidden');
-  $('#app').classList.remove('hidden');
-
-  ['banore','fatura','njoftime'].forEach(id=>$('#'+id).classList.add('hidden'));
-  const target = ['banore','fatura','njoftime'].includes(route) ? route : 'banore';
-  $('#'+target).classList.remove('hidden');
-
-  qa('.tabs .tab').forEach(a=>{
-    const isActive = a.getAttribute('href') === '#/'+target;
-    a.classList.toggle('active', isActive);
-  });
-
-  // Rifresko dropdown-in kur hapet Faturat
-  if(target === 'fatura'){ fillResidentsInSelect(); }
-}
-window.addEventListener('hashchange', router);
-
-/* ===== Helpers ===== */
-function monthNameFromISO(iso){ if(!iso) return ""; const d=new Date(iso); return monthNames[d.getMonth()]||""; }
-function nextInvoiceNumber(){
-  let n = load(LS_COUNTER, 1);
-  const year = new Date().getFullYear();
-  const code = `FAT-${year}-${String(n).padStart(4,'0')}`;
-  save(LS_COUNTER, n+1);
-  return code;
-}
-function getUsers(){ return load(LS_USERS,[]); }
-function saveUsers(arr){ save(LS_USERS,arr); }
-function getBills(){ return load(LS_BILLS,[]); }
-function saveBills(arr){ save(LS_BILLS,arr); }
-function getNotices(){ return load(LS_NOTICES,[]); }
-function saveNotices(arr){ save(LS_NOTICES,arr); }
-function session(){ return load(LS_SESSION,null); }
-
-/* ===== Ndrysho fjalëkalimin tim ===== */
-$('#btnChangePw').addEventListener('click', ()=>{
-  const s=session(); if(!s){ return; }
-  $('#pwCard').classList.toggle('hidden');
-  $('#pwMsg').textContent='';
-  $('#pwForm').reset();
-});
-$('#pwCancel').addEventListener('click', ()=>$('#pwCard').classList.add('hidden'));
-$('#pwForm').addEventListener('submit',(e)=>{
-  e.preventDefault();
-  const s=session(); if(!s){ alert('Session i pavlefshëm.'); return; }
-
-  const cur = $('#pwCurrent').value;
-  const nw  = $('#pwNew').value;
-  const cf  = $('#pwConfirm').value;
-
-  if(nw.length < 4){ $('#pwMsg').textContent='Fjalëkalimi i ri duhet të ketë të paktën 4 karaktere.'; return; }
-  if(nw !== cf){ $('#pwMsg').textContent='Fjalëkalimi i ri nuk përputhet me konfirmimin.'; return; }
-
-  const users = getUsers();
-  const idx = users.findIndex(u => u.id === s.id);
-  if(idx === -1){ $('#pwMsg').textContent='Përdoruesi nuk u gjet.'; return; }
-
-  if(users[idx].pass !== cur){
-    $('#pwMsg').textContent='Fjalëkalimi aktual është i pasaktë.';
-    return;
-  }
-
-  users[idx].pass = nw;
-  saveUsers(users);
-  $('#pwMsg').textContent='U ndryshua me sukses.';
-  setTimeout(()=>$('#pwCard').classList.add('hidden'), 600);
-});
-
-/* ===== Residents UI ===== */
-$('#btnToggleAddResident').addEventListener('click',()=>$('#addResidentCard').classList.toggle('hidden'));
-$('#rCancel').addEventListener('click',()=>$('#addResidentCard').classList.add('hidden'));
-
-$('#residentForm').addEventListener('submit',(e)=>{
-  e.preventDefault();
-  const s=session(); if(!s || s.role!=='admin'){ alert('Vetëm admin mund të shtojë banorë.'); return; }
-  const name=$('#rName').value.trim(), apt=$('#rApt').value.trim(), id=$('#rID').value.trim();
-  const phone=$('#rPhone').value.trim(), wa=$('#rWA').value.trim(), pw=$('#rPW').value;
-  if(!name||!apt||!id||!phone||!pw){ alert('Plotëso të gjitha fushat e detyrueshme.'); return; }
-  const users=getUsers();
-  if(users.some(u=>u.id===id)){ alert('Kjo ID ekziston.'); return; }
-  users.push({id, pass:pw, role:'resident', name, apt, phone, wa});
-  saveUsers(users);
-  e.target.reset(); $('#addResidentCard').classList.add('hidden');
-  drawResidents(); fillResidentsInSelect();
-});
-
-function drawResidents(){
-  const s=session(); const isAdmin=(s&&s.role==='admin');
-  const tb=$('#resTable tbody'); tb.innerHTML='';
-  getUsers().filter(u=>u.role!=='admin').forEach(u=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${u.name||'-'}</td>
-      <td>${u.apt||'-'}</td>
-      <td>${u.phone||'-'} ${u.wa?('<div class="muted">WA: '+u.wa+'</div>'):''}</td>
-      <td>${u.id}</td>
-      <td>
-        ${isAdmin?`
-          <div class="actions">
-            <button class="small btn btn-brand" data-act="edit" data-id="${u.id}">Ndrysho</button>
-            <span class="trash" data-id="${u.id}" title="Fshi">🗑</span>
-          </div>
-        `:'<span class="muted">—</span>'}
-      </td>`;
-    tb.appendChild(tr);
-  });
-  $('#editResidentCard').classList.add('hidden');
-}
-
-$('#resTable').addEventListener('click',(e)=>{
-  const s=session(); if(!s||s.role!=='admin') return;
-
-  const del=e.target.closest('.trash');
-  if(del){
-    const id=del.dataset.id;
-    if(!confirm('Fshi banorin dhe faturat e tij?')) return;
-    saveUsers(getUsers().filter(u=>u.id!==id));
-    saveBills(getBills().filter(b=>b.rid!==id));
-    drawResidents(); drawBills(); fillResidentsInSelect();
-    return;
-  }
-
-  const editBtn = e.target.closest('button[data-act="edit"]');
-  if(editBtn){
-    const id = editBtn.dataset.id;
-    const u = getUsers().find(x=>x.id===id);
-    if(!u) return;
-    $('#eID').value = u.id;
-    $('#eName').value = u.name || '';
-    $('#eApt').value = u.apt || '';
-    $('#ePhone').value = u.phone || '';
-    $('#eWA').value = u.wa || '';
-    $('#ePW').value = '';
-    $('#editResidentCard').classList.remove('hidden');
-  }
-});
-
-$('#eCancel').addEventListener('click',()=>$('#editResidentCard').classList.add('hidden'));
-
-$('#residentEditForm').addEventListener('submit',(e)=>{
-  e.preventDefault();
-  const s=session(); if(!s || s.role!=='admin'){ alert('Vetëm admin.'); return; }
-
-  const id = $('#eID').value;
-  const name = $('#eName').value.trim();
-  const apt = $('#eApt').value.trim();
-  const phone = $('#ePhone').value.trim();
-  const wa = $('#eWA').value.trim();
-  const pw = $('#ePW').value;
-
-  if(!name || !apt || !phone){ alert('Emri, Apt dhe Telefon janë të detyrueshme.'); return; }
-
-  const users = getUsers();
-  const idx = users.findIndex(u=>u.id===id);
-  if(idx===-1){ alert('Banori nuk u gjet.'); return; }
-
-  users[idx].name = name;
-  users[idx].apt = apt;
-  users[idx].phone = phone;
-  users[idx].wa = wa;
-  if(pw) users[idx].pass = pw;
-
-  saveUsers(users);
-
-  // Përditëso faturat me emrin e ri (who)
-  const bills = getBills().map(b => b.rid===id ? {...b, who:name} : b);
-  saveBills(bills);
-
-  $('#editResidentCard').classList.add('hidden');
-  drawResidents(); drawBills(); fillResidentsInSelect();
-  alert('U ruajtën ndryshimet.');
-});
-
-/* === Dropdown i banorëve në Fatura === */
-function fillResidentsInSelect(){
-  const sel = $('#bResident');
-  if(!sel) return;
-  sel.innerHTML = '<option value="">Zgjidh Banorin</option>';
-  getUsers()
-    .filter(u => u.role !== 'admin')
-    .forEach(u => {
-      const opt = document.createElement('option');
-      opt.value = u.id;
-      opt.textContent = `${u.name || u.id} (${u.id})`;
-      sel.appendChild(opt);
-    });
-}
-
-/* ===== Bills UI ===== */
-$('#btnToggleAddBill').addEventListener('click',()=>$('#addBillCard').classList.toggle('hidden'));
-$('#bCancel').addEventListener('click',()=>$('#addBillCard').classList.add('hidden'));
-
-$('#bDue').addEventListener('change', ()=>{
-  const m=monthNameFromISO($('#bDue').value);
-  $('#bDesc').value = m?`Kjo eshte pagesa e muajit ${m}. Ju faleminderit per korrektesine.`:'';
-});
-$('#bResident').addEventListener('change', ()=>{
-  $('#bTitle').value="Shërbimi i ashensorit dhe pastrimit të pallatit";
-  if(!$('#bDesc').value){ const m=monthNameFromISO($('#bDue').value); if(m) $('#bDesc').value=`Kjo eshte pagesa e muajit ${m}. Ju faleminderit per korrektesine.`; }
-});
-
-$('#billForm').addEventListener('submit',(e)=>{
-  e.preventDefault();
-  const s=session(); if(!s||s.role!=='admin'){ alert('Vetëm admin.'); return; }
-  const rid=$('#bResident').value; if(!rid){ alert('Zgjidh banorin'); return; }
-  const users=getUsers(); const r=users.find(u=>u.id===rid);
-  const due=$('#bDue').value; if(!due){ alert('Vendos datën'); return; }
-  const amount=Number($('#bAmount').value||0);
-  const bill={
-    num: nextInvoiceNumber(),
-    rid,
-    who: r?.name||rid,
-    title: $('#bTitle').value.trim(),
-    desc: $('#bDesc').value.trim() || (monthNameFromISO(due)?`Kjo eshte pagesa e muajit ${monthNameFromISO(due)}. Ju faleminderit per korrektesine.`:''),
-    due,
-    amount,
-    status:'Në pritje'
-  };
-  const arr=getBills(); arr.push(bill); saveBills(arr);
-  e.target.reset(); $('#addBillCard').classList.add('hidden');
-  drawBills();
-});
-
-function drawBills(){
-  const s=session(); 
-  const isAdmin = (s && s.role==='admin');
-
-  const tb=$('#billTable tbody'); 
-  tb.innerHTML='';
-
-  // Admin: të gjitha; Rezident: vetëm të vetat
-  const bills = isAdmin ? getBills() : getBills().filter(b => b.rid === s.id);
-
-  bills.forEach((b,i)=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${b.num}</td>
-      <td>${b.who} <div class="muted">${b.rid}</div></td>
-      <td>${b.title}</td>
-      <td class="muted">${b.desc||''}</td>
-      <td>${b.due}</td>
-      <td>${b.status}</td>
-      <td>
-        ${
-          isAdmin
-          ? `<div class="actions">
-               <button class="small btn" style="background:#25d366;color:#fff" data-act="wa" data-i="${i}">WhatsApp</button>
-               <button class="small btn btn-brand" data-act="toggle" data-i="${i}">Status</button>
-               <button class="small btn btn-grey" data-act="print" data-i="${i}">Print</button>
-               <button class="small btn btn-accent" data-act="pdf" data-i="${i}">PDF</button>
-               <button class="small btn btn-grey" data-act="pdfbw" data-i="${i}">PDF (B/W)</button>
-             </div>`
-          : '<span class="muted">—</span>'
+        function handleSelection(selectId) {
+            const val = document.getElementById(selectId).value;
+            if (val === "shqipe") showShqipeDiary();
+            else if (val === "histori") showHistoriDiary();
+            else if (val === "gjeografi") showGjeografiDiary();
+            else if (val === "qytetari") showQytetariDiary();
+            else if (val === "sociologji") showSociologjiDiary();
+            else if (val === "matematike") showMatematikeDiary();
+            else if (val === "fizike") showFizikeDiary();
+            else if (val === "biologji") showBiologjiDiary();
+            else if (val === "kimi") showKimiDiary();
+            else if (val === "tik") showTikDiary();
+            document.getElementById(selectId).value = "";
         }
-      </td>`;
-    tb.appendChild(tr);
-  });
-}
 
-// Veprimet mbi fatura (vetëm admin)
-$('#billTable').addEventListener('click', async (e)=>{
-  const btn=e.target.closest('button[data-act]'); if(!btn) return;
-  const s=session(); if(!s || s.role!=='admin') return;
+        function showShqipeDiary() {
+            modalTitle.innerText = "PLANIFIKIMI I ORËS MËSIMORE - GJUHË SHQIPE";
+            modalBody.innerHTML = `
+                <div class="no-copy">
+                <table class="diary-table">
+                  <tr><td><span class="bold">Fusha:</span> Gjuhët dhen komunikimi</td><td><span class="bold">Lënda:</span> Gjuhë Shqipe</td><td><span class="bold">Shkalla:</span> IV</td><td><span class="bold">Klasa:</span> IX</td><td><span class="bold">Data:</span> 15.05.2026</td></tr>
+                  <tr><td colspan="2"><span class="bold">Tema mësimore:</span> Analiza e figurës së Skënderbeut në letërsi</td><td colspan="3"><span class="bold">Situata e të nxënit (Reale):</span> <br>"Heroi midis nesh": Nxënësit diskutojnë mbi cilësitë që admirojnë te një person real sot (vullnetar, sportist etj.) dhen kërkojnë këto vlera morale te figura e Skënderbeut.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Rezultatet e të nxënit sipas kompetencave (Përfshirë AK):</span><br><br>
+                        <span class="bold">AK/SEN (PEI):</span> Nxënësi identifikon heroin në ilustrime dhen zgjedh cilësitë e duhura midis dy opsioneve.<br>
+                        <span class="bold">Leximi:</span> Nxënësi analizon tiparet e personazhit duke u mbështetur në fragmentin letërar.<br>
+                        <span class="bold">Mendimi kritik:</span> Krahason pasqyrimin historik med krijimin artistik.<br>
+                        <span class="bold">Shprehja:</span> Argumenton med shkrim dhen gojë rreth vlerave morale të heroit.
+                    </td><td colspan="2"><span class="bold">Fjalët kyçe:</span> Hero epik, hiperbolë, kompetencë, PEI, feedback.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Burimet & TIK:</span> Teksti "Gjuha Shqipe 9", M. Barleti. <span class="bold">TIK:</span> Projektor për shfaqjen e veprave të artit dhen betejave për nxitjen e imagjinatës.</td><td colspan="2"><span class="bold">Lidhja med fushat:</span> Histori, Arte Visuale.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">METODOLOGJIA DHE VEPRIMTARITË E NXËNËSVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">METODOLOGJIA</span></td><td colspan="3"><span class="bold">PËRSHKRIMI SPECIFIK I VEPRIMTARIVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">Lidhja e temës med situatën reale</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Bashkëbisedim / Pyetje "Si" dhen "Pse".</span><br>• <span class="bold">Provokimi:</span> Mësuesi pyet: <span class="italic">"Pse një zjarrfikës që rrezikon jetën për të tjerët konsiderohet hero dost?"</span>.<br>• <span class="bold">Veprimtaria:</span> Nxënësit listojnë vlerat morale (sakrifica, besa) dhen mësuesi i orienton drejt pyetjes: <span class="italic">"Si i shohim këto vlera te Skënderbeu i Barletit?"</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Ndërtimi i njohurive të reja (Diferencimi)</span><br><br>25 min</td><td colspan="3"><span class="bold">Teknika: Puna në Grupe të bazuara në nevoja.</span><br>• <span class="bold">Grupi AK:</span> Me mësuesin ndihmës, nxënësi punon med kartela vizuale dhen zgjedh: <span class="italic">"Skënderbeu ishte trim / frikacak"</span> ose <span class="italic">"Ai mbronte / sulmonte popullin"</span>.<br>• <span class="bold">Niveli i ulët:</span> Nëntendosin në tekst 5 mbiemra/fjalë kyçe që përshkruajnë fuqinë fizike të heroit.<br>• <span class="bold">Niveli mesatar:</span> Analizojnë fragmentin dhen gjejnë hiperbolat. Shpjegojnë: <span class="italic">"Pse autori përdor zmadhimin për të treguar trimërinë?"</span>.<br>• <span class="bold">Niveli i lartë:</span> Hartojnë një kontrast të shkurtër: <span class="italic">"Barleti e përshkruan si gjigant mitologjik, ndërsa historia si strateg gjakftohtë. Si bashkohen këto në vepër?"</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Prezantimi i rezultateve</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Feedback-u dhen Vetëvlerësimi.</span><br>• Nxënësit shkëmbejnë punimet dhen korrigjojnë gabimet e njëri-tjetrit (vlerësim i ndërsjellë).<br>• Mësuesi jep feedback argumentues: <span class="italic">"E saktë përdorimi i termit hiperbolë për të dëshmuar madhështinë e personazhit"</span>.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Vlerësimi dhen feedback-u:</span> Bazuar në nivelet e arritjes (1-4).<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 2:</span> Identifikon personazhin bur ka vështirësi në analizën e thellë.<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 3:</span> Analizon tiparet e personazhit dhen shpjegon saktë mjetet stilistike (hiperbolën).<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 4:</span> Interpreton thellë mesazhin, bën lidhje ndërlëndore dhen përdor terminologji të pasur.</td></tr>
+                  <tr><td colspan="5"><span class="bold">Detyrat dhen puna e pavarur:</span><br><span class="bold">Detyra 1:</span> Shkruani 3 cilësi të heroit që i vlerësoni më shumë dhen argumentoni pse.<br><span class="bold">Detyra 2:</span> Ese: "Pse mesazhi i Skënderbeut është i prekshëm edhe sot?".<br><span class="bold">Detyra 3:</span> Krijo një poster ose prezantim digjital (Canva/PPT) mē elementet kryesore të figurës.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Reflektimi i mësuesit (Detyrim pas orës):</span><br>1. A u përdorën pyetjet "Si" dhen "Pse" për të nxitur mendimin e lartë? ________________<br>2. A u realizua vlerësimi i nxënësit med AK sipas PEI-t? ________________<br>3. A u arrit kontrasti analitik nga nxënësit e shkëlqyer? ________________</td></tr>
+                </table></div>`;
+            modal.style.display = 'block';
+        }
 
-  const i=Number(btn.dataset.i); const act=btn.dataset.act;
-  const bills=getBills(); const b=bills[i]; const users=getUsers(); const r=users.find(u=>u.id===b.rid);
+        function showHistoriDiary() {
+            modalTitle.innerText = "PLANIFIKIMI I ORËS MËSIMORE - HISTORI";
+            modalBody.innerHTML = `
+                <div class="no-copy">
+                <table class="diary-table">
+                  <tr><td><span class="bold">Fusha:</span> Shoqëria dhen mjedisi</td><td><span class="bold">Lënda:</span> Histori</td><td><span class="bold">Shkalla:</span> III</td><td><span class="bold">Klasa:</span> V</td><td><span class="bold">Data:</span> 28.11.2025</td></tr>
+                  <tr><td colspan="2"><span class="bold">Tema mësimore:</span> 4. Shpallja e Pavarësisë së Shqipërisë</td><td colspan="3"><span class="bold">Situata e të nxënit:</span> "Kuvendi i Vlorës" (Analizimi i ngjarjeve historike të 28 Nëntorit 1912, duke u fokusuar te rëndësia e dokumentit të Pavarësisë, firmëtarët dhen simbolet kombëtare).</td></tr>
+                  <tr><td colspan="3"><span class="bold">Rezultatet e të nxënit sipas kompetencave (Përfshirë AK):</span><br><br>
+                        <span class="bold">Komunikimi:</span> Tregon kronologjinë e ngjarjeve të Shpalljes së Pavarësisë duke përdorur fjalorin e saktë historik.<br>
+                        <span class="bold">Të menduarit:</span> Dallon shkaqet dhen pasojat e ngritjes së flamurit në Vlorë në raport med situatën ballkanike.<br>
+                        <span class="bold">Personale:</span> Vlerëson kontributin e Ismail Qemalit dhen delegatëve, duke kuptuar rëndësinë e shtetformimit.
+                    </td><td colspan="2"><span class="bold">Fjalët kyçe:</span> Pavarësi, Ismail Qemali, Flamur, Kuvendi i Vlorës, Delegatë, Shpallje.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Burimet dhen Teknologjia:</span> Libri i Historisë Klasa 5 fq. 12, Fletore Pune fq. 8. <span class="bold">Teknologjia:</span> Projektor për të shfaqur foton e Aktit të Pavarësisë dhen video dokumentare.</td><td colspan="2"><span class="bold">Lidhja med fushat:</span> Gjuhë Shqipe, Edukim për Shoqërinë (Identiteti kombëtar).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Metodologjia dhen veprimtaritë e nxënësve</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">METODOLOGJIA</span></td><td colspan="3"><span class="bold">PËRSHKRIMI I VEPRIMTARIVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">Lidhja e temës med njohuritë e mëparshme</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Stuhia e ideve dhen Pyetje të shpejta.</span><br>• Pyes klasën: "Çfarë festojmë më 28 Nëntor?", "Kush e ngriti flamurin?". Shënojmë konceptet në dërrasë.<br>• <span class="pjerret">(Për nxënësin med AK: Përdoren flashcards med imazhe të flamurit dhen Ismail Qemalit për të nxitur përgjigje të thjeshta)</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Ndërtimi i njohurive të reja</span><br><br>25 min</td><td colspan="3"><span class="bold">Teknika: Lexim i drejtuar dhen Analizë dokumenti.</span><br>• <span class="bold">Hapi 1:</span> Datat kyçe në dërrasë. Udhëtimi i Ismail Qemalit. <span class="pjerret">(Nxënësi med AK ndjek udhëtimin në një hartë të thjeshtuar med ngjyra med ndihmën e mësuesit mbështetës)</span>.<br>• <span class="bold">Hapi 2:</span> Lexohet fq. 12. Identifikohet roli i delegatëve dhen rëndësia e dokumentit.<br>• <span class="bold">Hapi 3:</span> Vëzhgimi i Aktit të Pavarësisë në projektor. Pyetje mbi numrin e delegatëve.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Prezantimi i rezultateve</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Krijimi i skedës së fakteve historike.</span><br>• Nxënësit plotësojnë një dritare historike në fletore: Datën, Vendin, Udhëheqësin, Vendimin. Shkëmbejnë fletoret.<br>• <span class="pjerret">(Nxënësi med AK plotëson skedë të parapërgatitur ku ngjit foton e Ismail Qemalit dhen flamurin pranë datës)</span>.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Vlerësimi dhen feedback-u:</span> Nivelet (1-4).<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 1 (AK):</span> Identifikon med ndihmë simbolet kombëtare (flamurin) dhen Ismail Qemalin.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 2:</span> Identifikon personazhin dhen datën, bur ka vështirësi in shpjegimin e rëndësisë së Kuvendit.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 3:</span> Tregon saktë rrjedhën e ngjarjeve dhen plotëson skedën pa gabime.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 4:</span> Analizon pasojat e Shpalljes dhen argumenton rëndësinë e njohjes ndërkombëtare.</td></tr>
+                  <tr><td colspan="5"><span class="bold">Diferencimi & Detyrat:</span><br>
+                    • <span class="bold">Avancuar:</span> "Gazetarë të Kohës" - intervistojnë njëri-tjetrin si delegatë.<br>
+                    • <span class="bold">AK:</span> Ngjyros flamurin kuq e zi dhen shkruan med ndihmë numrin "1912".<br>
+                    • <span class="bold">Detyra e përgjithshme:</span> Plotësimi i pemës kronologjike në Fletore Pune (Detyra 2) ose letër imagjinare e një delegati (Detyra 3).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Refleksioni i mësuesit:</span> Pas orës vlerësohet funksionimi i materialeve të përshtatura për AK dhen lokalizimi në hartë nga nxënësit e tjerë.</td></tr>
+                </table></div>`;
+            modal.style.display = 'block';
+        }
 
-  if(act==='wa'){
-    const phone=(r?.wa||r?.phone||'').replace(/[^0-9]/g,'');
-    if(!phone){ alert('Nuk ka numër WhatsApp/Telefon tek ky banor.'); return; }
-    const msg=`Pershendetje ${b.who},%0A%0AFatura ${b.num} — ${b.title}.%0A${b.desc?b.desc+'%0A':''}Shuma: ALL ${Number(b.amount).toLocaleString('sq-AL')}.%0AAfati: ${b.due}.%0AFaleminderit per korrektesine.`;
-    window.open('https://wa.me/'+phone+'?text='+msg,'_blank');
-  }
-  if(act==='toggle'){
-    bills[i].status = (b.status==='Paguar' || b.status==='paid') ? 'Në pritje' : 'Paguar';
-    saveBills(bills); drawBills();
-  }
-  if(act==='print'){
-    const html=invoiceHTML(b,r,false); const w=window.open('','_blank'); w.document.write(html); w.document.close(); w.focus(); setTimeout(()=>w.print(),300);
-  }
-  if(act==='pdf'){
-    await downloadPDF(b,r,false);
-  }
-  if(act==='pdfbw'){
-    await downloadPDF(b,r,true);
-  }
-});
+        function showGjeografiDiary() {
+            modalTitle.innerText = "PLANIFIKIMI I ORËS MËSIMORE - GJEOGRAFI";
+            modalBody.innerHTML = `
+                <div class="no-copy">
+                <table class="diary-table">
+                  <tr><td><span class="bold">Fusha:</span> Shoqëria dhen mjedisi</td><td><span class="bold">Lënda:</span> Gjeografi</td><td><span class="bold">Shkalla:</span> III</td><td><span class="bold">Klasa:</span> V</td><td><span class="bold">Data:</span> 15.10.2025</td></tr>
+                  <tr><td colspan="2"><span class="bold">Tema mësimore:</span> 4. Planetët e Sistemit tonë Diellor</td><td colspan="3"><span class="bold">Situata e të nxënit:</span> "Udhëtimi në Hapësirë" (Identifikimi i planetëve që rrethojnë Diellin, rregullimi i tyre sipas distancës dhen krahasimi i karakteristikave si madhësia dhen përbërja).</td></tr>
+                  <tr><td colspan="3"><span class="bold">Rezultatet e të nxënit sipas kompetencave:</span><br><br>
+                        <span class="bold">Komunikimi:</span> Emërton dhen përshkruan planetët e Sistemit Diellor duke përdorur terminologjinë e saktë gjeografike.<br>
+                        <span class="bold">Të menduarit:</span> Klasifikon planetët në grupe (planetë të brendshëm shkëmborë dhen planetë të jashtëm gazorë).<br>
+                        <span class="bold">Personale:</span> Ndërgjegjësohet për pozicionin unik të Tokës si i vetmi planet që mban jetë.
+                    </td><td colspan="2"><span class="bold">Fjalët kyçe:</span> Sistem Diellor, Planetë, Orbitë, Gravitet, Toka, Satelit.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Burimet dhen Teknologjia:</span> Libri i Gjeografisë Klasa 5 fq. 20, Fletore Pune fq. 14. <span class="bold">TIK:</span> Projektor për model 3D të Sistemit Diellor, kohëmatës digjital.</td><td colspan="2"><span class="bold">Lidhja med fushat:</span> Shkencat e Natyrës (Astronomi), Matematikë.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Metodologjia dhen veprimtaritë e nxënësve</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">METODOLOGJIA</span></td><td colspan="3"><span class="bold">PËRSHKRIMI I VEPRIMTARIVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">Lidhja e temës med njohuritë e mëparshme</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Pyetje të shpejta dhen Brainstorming.</span><br>• Pyetje nxitëse: "Cili është ylli më i afërt?", "Sa planetë njohim?". Shënohen emrat e planetëve në dërrasë.<br>• <span class="pjerret">(Për nxënësin med AK: Përdoren modele sferike med ngjyra ose dritat e projektorit për të tërhequr vëmendjen te Dielli dhen Toka)</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Ndërtimi i njohurive të reja</span><br><br>25 min</td><td colspan="3"><span class="bold">Teknika: Vëzhgim i dreuatur dhen Analizë krahasuese.</span><br>• <span class="bold">Hapi 1:</span> Model 3D në projektor. Mësohet renditja nga Mërkuri te Neptuni. <span class="pjerret">(Nxënësi med AK ndjek renditjen me anë të kartelave të prekshme med madhësi të ndryshme med ndihmën e mësuesit mbështetës)</span>.<br>• <span class="bold">Hapi 2:</span> Lexohet fq. 20. Planetët ndahen në shkëmborë (4 të parët) dhen gjigandë gazorë (4 të fundit).<br>• <span class="bold">Hapi 3:</span> Analizë e tabelës së të dhënave në libër. Gjetja e informacioneve mbi madhësinë dhen pozicionin.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Prezantimi i rezultateve</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Krijimi i Pasaportës së Planetit.</span><br>• Nxënësit krijojnë një skedë për një planet (Emri, Renditja, Veçoritë) dhen bëjnë lojë kontrolli në dyshe.<br>• <span class="pjerret">(Nxënësi med AK ngjit figurën e një planeti të caktuar mbi një rreth që përfaqëson orbitën e tij)</span>.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Vlerësimi dhen feedback-u:</span> Nivelet (1-4).<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 1 (AK):</span> Identifikon Diellin dhen Tokën në modelin vizual dhen dallon ngjyrat kryesore med ndihmë.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 2:</span> Emërton disa planetë, bur ka vështirësi t'i rendisë saktë sipas distancës.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 3:</span> Rendit saktë planetët dhen bën dallimin mes shkëmborëve dhen gazorëve.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 4:</span> Shpjegon rolin e forcës së gravitetit dhen argumenton kushtet që e bëjnë Tokën të jetueshme.</td></tr>
+                  <tr><td colspan="5"><span class="bold">Diferencimi & Detyrat:</span><br>
+                    • <span class="bold">Avancuar:</span> "Udhërrëfyes Galaktikë" - reklamë med gojë për të vizituar Saturnin ose Jupiterin.<br>
+                    • <span class="bold">AK:</span> Puzzle të thjeshtë ose ngjyrosje e Tokës med të kaltër/gjelbër. Detyrë shtëpie: Ngjyros Diellin dhen ngjit fjalën "DIELLI".<br>
+                    • <span class="bold">Bazë/Mesatare:</span> Shkruaj 4 planetët më të afërt (D1) ose plotëso skemën në Fletore Pune (D2).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Refleksioni i mësuesit:</span> Vlerësohet nëse modeli 3D ndihmoi për konceptin e orbitës tek AK dhen nëse klasifikimi shkaktoi vështirësi tek të tjerët.</td></tr>
+                </table></div>`;
+            modal.style.display = 'block';
+        }
 
-/* ===== Njoftimet ===== */
-$('#btnToggleAddNotice').addEventListener('click',()=>{
-  const s=session(); $('#addNoticeCard').classList.toggle('hidden', !(s&&s.role==='admin'));
-});
-$('#nCancel').addEventListener('click',()=>$('#addNoticeCard').classList.add('hidden'));
-$('#noticeForm').addEventListener('submit', async (e)=>{
-  e.preventDefault(); const s=session(); if(!s||s.role!=='admin'){ alert('Vetëm admin shton njoftime.'); return; }
-  const title=$('#nTitle').value.trim(); if(!title){ alert('Titulli?'); return; }
-  let img=''; const f=$('#nImg').files?.[0];
-  if(f){ img=await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(f); }); }
-  const body=$('#nBody').value.trim();
-  const arr=getNotices(); arr.unshift({id:'n'+Date.now(),title,body,img,ts:Date.now()}); saveNotices(arr);
-  e.target.reset(); $('#addNoticeCard').classList.add('hidden'); drawNotices();
-});
-function drawNotices(){
-  const list=$('#noticeList'); list.innerHTML='';
-  getNotices().forEach(n=>{
-    const when=new Date(n.ts).toLocaleString('sq-AL');
-    const box=document.createElement('div'); box.className='card pad'; box.style.marginBottom='10px';
-    box.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:800">${n.title}</div><div class="muted" style="font-size:12px">${when}</div></div>
-                   ${n.img?`<img src="${n.img}" style="max-width:100%;border-radius:12px;border:1px solid #eef2f7;margin-top:8px">`:''}
-                   ${n.body?`<div class="muted" style="margin-top:8px">${n.body.replaceAll('\n','<br>')}</div>`:''}`;
-    list.appendChild(box);
-  });
-}
+        function showQytetariDiary() {
+            modalTitle.innerText = "PLANIFIKIMI I ORËS MËSIMORE - QYTETARI";
+            modalBody.innerHTML = `
+                <div class="no-copy">
+                <table class="diary-table">
+                  <tr><td><span class="bold">Fusha:</span> Shoqëria dhen mjedisi</td><td><span class="bold">Lënda:</span> Qytetari</td><td><span class="bold">Shkalla:</span> III</td><td><span class="bold">Klasa:</span> V</td><td><span class="bold">Data:</span> 03.11.2025</td></tr>
+                  <tr><td colspan="2"><span class="bold">Tema mësimore:</span> 4. Të drejtat dhen përgjegjësitë tona në shkollë</td><td colspan="3"><span class="bold">Situata e të nxënit:</span> "Rregullat e Klasës sime" (Diskutimi i të drejtave në shkollë dhen ballafaqimi i tyre med përgjegjësitë për një bashkëjetesë harmonike).</td></tr>
+                  <tr><td colspan="3"><span class="bold">Rezultatet e të nxënit sipas kompetencave:</span><br><br>
+                        <span class="bold">Komunikimi:</span> Shpreh mendimin rreth rëndësisë së të drejtave dhen përgjegjësive med shembuj konkretë.<br>
+                        <span class="bold">Të menduarit:</span> Klasifikon veprimet e përditshme në kategori (E drejtë vs. Përgjegjësi).<br>
+                        <span class="bold">Personale:</span> Demostron respekt ndaj të drejtave të të tjerëve dhen pranon detyrimet.
+                    </td><td colspan="2"><span class="bold">Fjalët kyçe:</span> Të drejta, Përgjegjësi, Rregullore, Respekt, Klasë, Qytetar.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Burimet dhen Teknologjia:</span> Libri i Qytetarisë Klasa 5 fq. 16, Fletore Pune fq. 10. <span class="bold">TIK:</span> Projektor për pikat e Konventës së të Drejtave të Fëmijëve, kohëmatës digjital.</td><td colspan="2"><span class="bold">Lidhja med fushat:</span> Gjuhë Shqipe (Të folurit dhen të dëgjuarit), Histori.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Metodologjia dhen veprimtaritë e nxënësve</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">METODOLOGJIA</span></td><td colspan="3"><span class="bold">PËRSHKRIMI I VEPRIMTARIVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">Lidhja e temës med njohuritë e mëparshme</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Stuhia e ideve dhen Pyetje të shpejta.</span><br>• Pyetje nxitëse: "Çfarë doni të bëni lirisht në shkollë?", "Po nëse dikush bën zhurmë?". Shënohen idetë në dritare dypjesëshe.<br>• <span class="pjerret">(Për nxënësin med AK: Përdoren karta vizuale med dy ngjyra – jeshile për sjellje të mira dhen e kuqe për thyerje rregullash)</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Ndërtimi i njohurive të reja</span><br><br>25 min</td><td colspan="3"><span class="bold">Teknika: Analizë rasti dhen Ndarje në grupe.</span><br>• <span class="bold">Hapi 1:</span> Dallimi teorik: E drejta (ajo që na takon) vs. Përgjegjësia (detyra jonë). <span class="pjerret">(AK ndjek shpjegimin përmes ilustrimeve të fëmijëve duke mësuar / mbajtur qetësi)</span>.<br>• <span class="bold">Hapi 2:</span> Lexohet fq. 16 mbi rregulloren. Identifikohen 3 të drejta dhen 3 përgjegjësi.<br>• <span class="bold">Hapi 3:</span> Skenar: "Një nxënës flet pa ngritur dorën". Nxënësit gjejnë cilat përgjegjësi u shkelën dhen si preken të tjerët.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Prezantimi i rezultateve</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Karta e të Drejtave të Klasës.</span><br>• Punë në dyshe: Shkruhet një e drejtë e shoqëruar med përgjegjësinë përkatëse në një karton. Shkëmbimi i kartonave.<br>• <span class="pjerret">(Nxënësi med AK ngjit një Mongol buzëqeshjeje pranë ilustrimit të një sjelljeje të rregullt)</span>.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Vlerësimi dhen feedback-u:</span> Nivelet (1-4).<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 1 (AK):</span> Klasifikon sjelljet në të pranuara ose jo përmes kartave med ngjyra, med ndihmë.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 2:</span> Përmend disa të drejta, bur e ka të vështirë t'i lidhë direkt med përgjegjësitë.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 3:</span> Dallon qartë dhen klasifikon saktë sipas modelit të punuar.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 4:</span> Argumenton në mënyrë kritike rëndësinë e rregullave dhen propozon zgjidhje konfliktesh.</td></tr>
+                  <tr><td colspan="5"><span class="bold">Diferencimi & Detyrat:</span><br>
+                    • <span class="bold">Avancuar:</span> "Ombudsmani i klasës" - hartojnë një kod med 3 rregulla për mjedisin.<br>
+                    • <span class="bold">AK:</span> Ngjyros poster mē fëmijë që shtrëngojnë duart. Detyrë shtëpie: Ngjit foto familjare dhen shkruaj "RESPEKT".<br>
+                    • <span class="bold">Detyrat e tjera:</span> Rregullat në shtëpi (D1), plotësimi i tabelës në Fletore Pune (D2) ose ese "Liria ime mbaron..." (D3).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Refleksioni i mësuesit:</span> Analizohet efikasiteti i kartave med ngjyra për AK dhen kuptimi i lidhjes mes të drejtës dhen detyrimit nga nxënësit e tjerë.</td></tr>
+                </table></div>`;
+            modal.style.display = 'block';
+        }
 
-/* ===== Fatura: Print & PDF ===== */
-function invoiceCSS(bw=false){
-  if(bw){
-    return `<style>
-      *{color:#000 !important}
-      body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:0}
-      .inv{max-width:800px;margin:0 auto;padding:28px}
-      .brand{height:6px;background:#000;border-radius:3px;margin-bottom:16px}
-      .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-      .logo{max-height:54px;filter:grayscale(1) contrast(1.4)}
-      .title{font-size:24px;font-weight:900;letter-spacing:.3px}
-      .muted{color:#000 !important}
-      .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
-      .box{border:2px solid #000;border-radius:12px;padding:12px}
-      table{width:100%;border-collapse:collapse;margin-top:8px}
-      th,td{padding:12px;border-bottom:2px solid #000;text-align:left}
-      thead th{font-weight:800}
-      .right{text-align:right}
-      .total-row td{font-weight:900;border-top:3px solid #000}
-      .foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
-      .thanks{border:2px solid #000;padding:8px 12px;border-radius:10px;font-weight:700}
-      .no-print{display:inline-block;margin-top:10px;padding:8px 12px;border:2px solid #000;border-radius:10px;background:#fff;cursor:pointer}
-      @media print {.no-print{display:none}}
-    </style>`;
-  }
-  return `<style>
-    body{font-family:system-ui,Segoe UI,Roboto,Arial;color:#0f172a;margin:0}
-    .inv{max-width:800px;margin:0 auto;padding:28px}
-    .brand{background:linear-gradient(135deg,#0ea5e9,#10b981);height:6px;border-radius:3px;margin-bottom:16px}
-    .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .logo{max-height:54px}
-    .title{font-size:24px;font-weight:900;letter-spacing:.3px}
-    .muted{color:#64748b}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
-    .box{border:1px solid #e5e7eb;border-radius:12px;padding:12px}
-    table{width:100%;border-collapse:collapse;margin-top:8px}
-    th,td{padding:12px;border-bottom:1px solid #eef2f7;text-align:left}
-    thead th{background:#f8fafc;color:#64748b;text-transform:uppercase;font-size:12px}
-    .right{text-align:right}
-    .total-row td{font-weight:900}
-    .foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
-    .thanks{color:#065f46;background:#ecfdf5;border:1px solid #a7f3d0;padding:8px 12px;border-radius:10px}
-    .no-print{display:inline-block;margin-top:10px;padding:8px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#f8fafc;cursor:pointer}
-    @media print {.no-print{display:none}}
-  </style>`;
-}
-function invoiceInner(b,r,bw=false){
-  const status=(b.status==='Paguar' || b.status==='paid')?'Paguar':'Në pritje';
-  return `
-    <div class="brand"></div>
-    <div class="hdr">
-      <div>
-        <div class="title">FATURË</div>
-        <div class="muted">Numri: ${b.num}</div>
-      </div>
-      <img class="logo" src="https://i.postimg.cc/Pf01SyBG/LEONARD-LOGO.png" alt="Logo">
-    </div>
+        function showSociologjiDiary() {
+            modalTitle.innerText = "PLANIFIKIMI I ORËS MËSIMORE - SOCIOLOGJI";
+            modalBody.innerHTML = `
+                <div class="no-copy">
+                <table class="diary-table">
+                  <tr><td><span class="bold">Fusha:</span> Shoqëria dhen mjedisi</td><td><span class="bold">Lënda:</span> Sociologji</td><td><span class="bold">Shkalla:</span> V</td><td><span class="bold">Klasa:</span> XI</td><td><span class="bold">Data:</span> 12.12.2025</td></tr>
+                  <tr><td colspan="2"><span class="bold">Tema mësimore:</span> 4. Grupet shoqërore dhen llojet e tyre</td><td colspan="3"><span class="bold">Situata e të nxënit:</span> "Rrethi im shoqëror" (Analizimi i grupeve ku nxënësit bëjnë pjesë në përditshmëri, nga familja te komunitetet, për të kuptuar dinamikat e tyre).</td></tr>
+                  <tr><td colspan="3"><span class="bold">Rezultatet e të nxënit sipas kompetencave:</span><br><br>
+                        <span class="bold">Komunikimi:</span> Përkufizon konceptun e grupit shoqëror dhen shpjegon funksionet med fjalor të saktë.<br>
+                        <span class="bold">Të menduarit:</span> Klasifikon dhen krahason grupet parësore (familja) nga ato dytësore (shkolla, organizatat).<br>
+                        <span class="bold">Personale:</span> Vlerëson ndikimin e grupeve në formësimin e identitetit individual.
+                    </td><td colspan="2"><span class="bold">Fjalët kyçe:</span> Grup shoqëror, Grup parësor, Grup dytësor, Interaksion, Normë sociale.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Burimet dhen Teknologjia:</span> Libri i Sociologjisë fq. 24, Fletore Pune fq. 18. <span class="bold">TIK:</span> Projektor për diagramën e rrjeteve sociale, kohëmatës digjital.</td><td colspan="2"><span class="bold">Lidhja med fushat:</span> Psikologji (Sjellja individuale në grup), Histori.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Metodologjia dhen veprimtaritë e nxënësve</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">METODOLOGJIA</span></td><td colspan="3"><span class="bold">PËRSHKRIMI I VEPRIMTARIVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">Lidhja e temës med njohuritë e mëparshme</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Pyetje të shpejta dhen Brainstorming.</span><br>• Pyetje nxitëse: "A jeton dot njeriu i izoluar?", "Cilat janë 3 grupet tuaja të para?". Shënohen në dërrasë.<br>• <span class="pjerret">(Për nxënësin med AK: Foto të një familjeje dhen të një klase për të nxitur dallimin e thjeshtë vizual të grupeve)</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Ndërtimi i njohurive të reja</span><br><br>25 min</td><td colspan="3"><span class="bold">Teknika: Leksion i ndërvepruar dhen Diagramë krahasuese.</span><br>• <span class="bold">Hapi 1:</span> Kriteret e grupit (ndërveprimi, përkatësia, qëllimi). <span class="pjerret">(AK ndjek shpjegimin përmes simboleve grafike të njerëzve që komunikojnë)</span>.<br>• <span class="bold">Hapi 2:</span> Punë med fq. 24. Analizohet pse familja është grup parësor (emocional) dhen shkolla dytësor (formal).<br>• <span class="bold">Hapi 3:</span> Analizë rasti në projektor: Dallimi i grupeve të mirëfillta nga grumbullimet e rastësishme (stacion autobusi).</td></tr>
+                  <tr><td colspan="2"><span class="bold">Prezantimi i rezultateve</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Hartëzimi i Grupeve Personale (Diagrama e Venit).</span><br>• Nxënësit ndërtojnë një diagramë med grupet parësore në rrethin e brendshëm dhen ato dytësore në të jashtmin.<br>• <span class="pjerret">(Nxënësi med AK ngjit figura të gatshme të familjes dhen shokëve në rrethin e duhur të diagramës)</span>.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Vlerësimi dhen feedback-u:</span> Nivelet (1-4).<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 1 (AK):</span> Identifikon rrethin familjar dhen shoqëror përmes fotove, emërton një anëtar med ndihmë.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 2:</span> Përkufizon thjesht fjalën "grup", bur e ka të vështirë dallimet mes grupeve formale dhen joformale.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 3:</span> Klasifikon saktë grupet parësore dhen dytësore duke treguar veçoritë.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 4:</span> Analizon presionin e grupit (konformizmin) dhen rolin e normave në shoqëri.</td></tr>
+                  <tr><td colspan="5"><span class="bold">Diferencimi & Detyrat:</span><br>
+                    • <span class="bold">Avancuar:</span> Hulumtojnë dukurinë e "Grupeve të Jashtme" (Out-groups) dhen paragjykimet virtuale.<br>
+                    • <span class="bold">AK:</span> Ngjyrosje e anëtarëve të familjes / lidhje med vijë e uniformave. Detyrë shtëpie: Vizato rrethin familjar.<br>
+                    • <span class="bold">Detyra e përgjithshme:</span> Karakteristikat në Fletore Pune (D2) ose ese mbi grupet virtuale te adoleshentët (D3).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Refleksioni i mësuesit:</span> Vlerësohet nëse përkatësia u perceptua përmes klasifikimit vizual te AK dhen nëse konceptet formale u kuptuan qartë.</td></tr>
+                </table></div>`;
+            modal.style.display = 'block';
+        }
 
-    <div class="grid">
-      <div class="box">
-        <div style="font-weight:800;margin-bottom:4px">Dërguesi</div>
-        <div>Administrata e Pallatit</div>
-        ${bw ? '' : '<div class="muted">Shërbimi i ashensorit dhe pastrimit</div>'}
-      </div>
-      <div class="box">
-        <div style="font-weight:800;margin-bottom:4px">Për</div>
-        <div>${b.who||'-'} ${r?.apt?(' • Apt '+r.apt):''}</div>
-        <div class="muted">${r?.id?('ID '+r.id):''} ${r?.phone?(' • Tel '+r.phone):''} ${r?.wa?(' • WA '+r.wa):''}</div>
-      </div>
-    </div>
+        function showMatematikeDiary() {
+            modalTitle.innerText = "PLANIFIKIMI I ORËS MËSIMORE - MATEMATIKË";
+            modalBody.innerHTML = `
+                <div class="no-copy">
+                <table class="diary-table">
+                  <tr><td><span class="bold">Fusha:</span> Matematikë</td><td><span class="bold">Lënda:</span> Matematikë</td><td><span class="bold">Shkalla:</span> III</td><td><span class="bold">Klasa:</span> V</td><td><span class="bold">Data:</span> 10.02.2026</td></tr>
+                  <tr><td colspan="2"><span class="bold">Tema mësimore:</span> 4. Kuptimi i thyesës dhen llojet e saj</td><td colspan="3"><span class="bold">Situata e të nxënit:</span> "Ndarja e një pice" (Përdorimi i modeleve konkrete dhen figurave gjeometrike të ndara në pjesë të barabarta për të ilustruar numëruesin, emëruesin dhen vijën e thyesës).</td></tr>
+                  <tr><td colspan="3"><span class="bold">Rezultatet e të nxënit sipas kompetencave:</span><br><br>
+                        <span class="bold">Komunikimi:</span> Lexon dhen shkruan saktë thyesat e thjeshta duke përdorur fjalorin e duhur matematikore.<br>
+                        <span class="bold">Të menduarit:</span> Identifikon dhen dallon thyesat e rregullta (më të vogla se 1) nga ato të parregullta.<br>
+                        <span class="bold">Personale:</span> Zbaton konceptun e ndarjes në pjesë të barabarta in situata të thjeshta të jetës.
+                    </td><td colspan="2"><span class="bold">Fjalët kyçe:</span> Thyesë, Numërues, Emërues, Vijë thyeze, Pjesë e barabartë, Thyesë e rregullt.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Burimet dhen Teknologjia:</span> Libri i Matematikës Klasa 5 fq. 45, Fletore Pune fq. 32. <span class="bold">TIK:</span> Projektor për figura gjeometrike interaktive të ngjyrosura, kohëmatës digjital.</td><td colspan="2"><span class="bold">Lidhja med fushat:</span> Arte (Ngjyrosje simetrike), Gjuhë Shqipe (Mënyra e leximit të numrave rreshtorë).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Metodologjia dhen veprimtaritë e nxënësve</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">METODOLOGJIA</span></td><td colspan="3"><span class="bold">PËRSHKRIMI I VEPRIMTARIVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">Lidhja e temës med njohuritë e mëparshme</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Diskutim dhen Brainstorming med mjete konkrete.</span><br>• Ndaj një mollë para klasës in dy dhen katër pjesë të barabarta. Pyetje: "Si quhet secila pjesë?", "Po nëse marr 3 pjesë?".<br>• <span class="pjerret">(Për nxënësin med AK: Përdoren blloqe lego ose figura magnetike të ndara në gjysma për të ndier konceptun)</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Ndërtimi i njohurive të reja</span><br><br>25 min</td><td colspan="3"><span class="bold">Teknika: Shpjegim i udhëhequr dhen Punë praktike med modele.</span><br>• <span class="bold">Hapi 1:</span> Elementet e thyesës (3/4). Shpjegimi i emëruesit dhen numëruesit. <span class="pjerret">(AK ndjek elementet duke përdorur karta ku numrat janë med ngjyra të ndryshme: numëruesi i kuq, emëruesi i zi)</span>.<br>• <span class="bold">Hapi 2:</span> Lexohet fq. 45. Prezantohen thyesat e rregullta dhen ato të parregullta.<br>• <span class="bold">Hapi 3:</span> Nxënësit vizatojnë rrathë dhen ngjyrosin pjesët sipas thyesave të shkruara në dërrasë.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Prezantimi i rezultateve</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Loja "Lidh Thyesën med Figurën".</span><br>• Punë në dyshe: Çiftimi i shpejtë i fletëve med thyesa med figurat përkatëse të ngjyrosura.<br>• <span class="pjerret">(Nxënësi med AK punon med një model të thjeshtuar med dy opsione: gjysmën 1/2 dhen të tërën 1, ku ngjit magnetët)</span>.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Vlerësimi dhen feedback-u:</span> Nivelet (1-4).<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 1 (AK):</span> Dallon një figurë të ndarë nga një e plotë dhen ngjyros pjesë med ndihmën e mësuesit mbështetës.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 2:</span> Shkruan thyesat e thjeshta bazuar në figura, bur ngatërron klasifikimin e llojeve.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 3:</span> Identifikon med saktësi numëruesin/emëruesin, plotëson ushtrimet dhen klasifikon saktë.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 4:</span> Krijon modele thyesore të pavarura, argumenton kthimin në numër të përzier dhen zgjidh problema.</td></tr>
+                  <tr><td colspan="5"><span class="bold">Diferencimi & Detyrat:</span><br>
+                    • <span class="bold">Avancuar:</span> "Thyesat e Barabarta" - vërtetojnë grafikisht pse 1/2 = 2/4 = 4/8.<br>
+                    • <span class="bold">AK:</span> Konture të trashura të katrorëve ku ngjyros vetëm gjysmën (1/2). Shtëpi: Ngjyros gjysmën e rrethit.<br>
+                    • <span class="bold">Detyra e përgjithshme:</span> Shkruaj thyesat med numra (D1), rretho llojet në Fletore Pune (D2) ose shto problemë nga jeta (D3).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Refleksioni i mësuesit:</span> Verifikohet ndikimi i mjeteve konkrete (mollë/lego) te AK dhen nëse emërtimi i thyesaves të parregullta solli konfuzion te niveli mesatar.</td></tr>
+                </table></div>`;
+            modal.style.display = 'block';
+        }
 
-    <table>
-      <thead><tr><th>Përshkrimi</th><th class="right">Shuma</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><b>${b.title}</b>${b.desc?('<div class="'+(bw?'':'muted')+'">'+b.desc+'</div>'):''}</td>
-          <td class="right">ALL ${Number(b.amount||0).toLocaleString('sq-AL')}</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr class="total-row"><td>Totali</td><td class="right">ALL ${Number(b.amount||0).toLocaleString('sq-AL')}</td></tr>
-      </tfoot>
-    </table>
+        function showFizikeDiary() {
+            modalTitle.innerText = "PLANIFIKIMI I ORËS MËSIMORE - FIZIKË";
+            modalBody.innerHTML = `
+                <div class="no-copy">
+                <table class="diary-table">
+                  <tr><td><span class="bold">Fusha:</span> Shkencat e natyrës</td><td><span class="bold">Lënda:</span> Fizikë</td><td><span class="bold">Shkalla:</span> IV</td><td><span class="bold">Klasa:</span> VI</td><td><span class="bold">Data:</span> 18.03.2026</td></tr>
+                  <tr><td colspan="2"><span class="bold">Tema mësimore:</span> 4. Forca e fërkimit dhen ndikimi i saj në lëvizje</td><td colspan="3"><span class="bold">Situata e të nxënit:</span> "Rrëshqitja mbi sipërfaqe" (Shtytja e një kubi druri mbi sipërfaqe si qelq, zmeril dhen druri për të vëzhguar ndryshimin e forcës së fërkimit dhen rezistencën).</td></tr>
+                  <tr><td colspan="3"><span class="bold">Rezultatet e të nxënit sipas kompetencave:</span><br><br>
+                        <span class="bold">Komunikimi:</span> Përshkruan med gojë dhen shkrim fërkimin si forcë që kundërshton lëvizjen med fjalor shkencor.<br>
+                        <span class="bold">Të menduarit:</span> Krahason madhësinë e forcës së fërkimit mbi sipërfaqe të lëmuara dhen të ashpra bazuar në matje.<br>
+                        <span class="bold">Personale:</span> Identifikon dobinë dhen disavantazhet e fërkimit në situata praktike (ecja, frenimi).
+                    </td><td colspan="2"><span class="bold">Fjalët kyçe:</span> Forcë, Fërkim, Dinamometër, Sipërfaqe e ashpër, Rezistencë, Lëvizje.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Burimet dhen Teknologjia:</span> Libri i Fizikës Klasa 6 fq. 50, Fletore Pune fq. 38, kub druri, dinamometër, letër zmerili, vaj. <span class="bold">TIK:</span> Simulim digjital i fërkimit në nivel mikroskopik, kohëmatës digjital.</td><td colspan="2"><span class="bold">Lidhja med fushat:</span> Matematikë (Leximi i shkallëzimit dhen grafiku), Teknologji.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Metodologjia dhen veprimtaritë e nxënësve</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">METODOLOGJIA</span></td><td colspan="3"><span class="bold">PËRSHKRIMI I VEPRIMTARIVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">Lidhja e temës med njohuritë e mëparshme</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Pyetje të shpejta dhen Brainstorming Eksperimental.</span><br>• Nxënësit fërkojnë duart fort. Pyetje: "Çfarë ndjeni?", "Pse ngrohen duart?", "Pse është vështirë të ecësh në akull?".<br>• <span class="pjerret">(Për nxënësin med AK: Ndjen ndryshimin e nxehtësisë duke fërkuar duart med ndihmën e mësuesit dhen prek dy copa materiali, të mëndafshtë dhen të ashpër)</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Ndërtimi i njohurive të reja</span><br><br>25 min</td><td colspan="3"><span class="bold">Teknika: Eksperiment i dreuatur dhen Punë në grupe.</span><br>• <span class="bold">Hapi 1:</span> Tërhiqet kubi med dinamometër. Lexohet forca në Njuton. <span class="pjerret">(Nxënësi med AK ndjek lëvizjen e kubit dhen shikon shigjetën e dinamometrit të zmadhuar në një kartelë grafike)</span>.<br>• <span class="bold">Hapi 2:</span> Grupet përsërisin eksperimentin mbi zmeril dhen duke hedhur vaj. Regjistrojnë të dhënat në fq. 50.<br>• <span class="bold">Hapi 3:</span> Përfundimi: Sa më e ashpër sipërfaqja, aq më e madhe forca. Vajrat e zvogëlojnë fërkimin.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Prezantimi i rezultateve</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Diagrama "Dobia vs. Disavantazhet".</span><br>• Plotësimi i diagramës in dyshe: Kur ndihmon (shkrimi) dhen kur dëmton (gërryerja). Vetëvlerësim.<br>• <span class="pjerret">(Nxënësi med AK klasifikon dy foto: makinë që frenon dhen këpucë e konsumuar, duke i ngjitur në shtyllat përkatëse)</span>.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Vlerësimi dhen feedback-u:</span> Nivelet (1-4).<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 1 (AK):</span> Ndjen dallimin e sipërfaqeve përmes prekjes dhen tregon nëse trupi lëviz shpejt/ngadalë.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 2:</span> Përkufizon forcën e fërkimit dhen varësinë nga sipërfaqja, bur ka vështirësi në leximin e dinamometrit.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 3:</span> Kryen eksperimentin, lexon saktë dinamometrin dhen rendit sipërfaqet sipas forcës.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 4:</span> Analizon grafikisht të dhënat, shpjegon shkaqet in nivel mikroskopik dhen propozon zgjidhje zvogëlimi.</td></tr>
+                  <tr><td colspan="5"><span class="bold">Diferencimi & Detyrat:</span><br>
+                    • <span class="bold">Avancuar:</span> Hulumtojnë "Rezistencën e Ajrit" (forma aerodinamike e makinave të garave, parashuta).<br>
+                    • <span class="bold">AK:</span> Maket makine med rrota mbi bankë dhen rrugicë stofi. Shtëpi: Ngjyros rrotën e makinës dhen vizato rrugën.<br>
+                    • <span class="bold">Detyrat e tjera:</span> Shembuj dobie (D1), rritje/zvogëlim në fq. 38 (D2) ose tregim imagjinar pa fërkim (D3).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Refleksioni i mësuesit:</span> Kontrollohet nëse ndjesia taktile ndihmoi AK dhen nëse u shfaqën vështirësi mes forcës së shtytjes dhen asaj të fërkimit.</td></tr>
+                </table></div>`;
+            modal.style.display = 'block';
+        }
 
-    <div class="foot">
-      <div>
-        <span style="font-weight:700;color:#000">Afati: ${b.due}</span>
-        <span style="font-weight:700;color:#000;margin-left:8px">Statusi: ${status}</span>
-      </div>
-      <div class="thanks">${bw?'Faleminderit!':'Faleminderit për korrektësinë!'}</div>
-    </div>
+        function showBiologjiDiary() {
+            modalTitle.innerText = "PLANIFIKIMI I ORËS MËSIMORE - BIOLOGJI";
+            modalBody.innerHTML = `
+                <div class="no-copy">
+                <table class="diary-table">
+                  <tr><td><span class="bold">Fusha:</span> Shkencat e natyrës</td><td><span class="bold">Lënda:</span> Biologji</td><td><span class="bold">Shkalla:</span> IV</td><td><span class="bold">Klasa:</span> VI</td><td><span class="bold">Data:</span> 22.04.2026</td></tr>
+                  <tr><td colspan="2"><span class="bold">Tema mësimore:</span> 4. Procesi i fotosintezës te bimët e gjelbra</td><td colspan="3"><span class="bold">Situata e të nxënit:</span> "Fabrika e gjelbër" (Vëzhgimi i gjetheve të një bime in dritë dhen një tjetre in errësirë për disa ditë, për të kuptuar ndikimin e dritës në prodhim n e ushqimit).</td></tr>
+                  <tr><td colspan="3"><span class="bold">Rezultatet e të nxënit sipas kompetencave:</span><br><br>
+                        <span class="bold">Komunikimi:</span> Shpjegon med fjalë të thjeshta fotosintezën dhen rolin e klorofilit duke përdorur fjalor të saktë.<br>
+                        <span class="bold">Të menduarit:</span> Identifikon elementet hyrëse (uji, CO2, drita) dhen ato dalëse (glukoza, oksigjeni).<br>
+                        <span class="bold">Personale:</span> Vlerëson rëndësinë e bimëve si prodhuese të oksigjenit për jetën në Tokë.
+                    </td><td colspan="2"><span class="bold">Fjalët kyçe:</span> Fotosintezë, Klorofil, Gjethe, Dritë dielli, Glukozë, Oksigjen.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Burimet dhen Teknologjia:</span> Libri i TIK Klasa 5 fq. 18, Fletore Pune fq. 12. <span class="bold">TIK:</span> Projektor për video të animuar mbi absorbimin e dritës nga kloroplastet, kohëmatës digjital.</td><td colspan="2"><span class="bold">Lidhja med fushat:</span> Kimi (Gazrat), Gjeografi (Cikli i ujit dhen ajrit).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Metodologjia dhen veprimtaritë e nxënësve</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">METODOLOGJIA</span></td><td colspan="3"><span class="bold">PËRSHKRIMI I VEPRIMTARIVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">Lidhja e temës med njohuritë e mëparshme</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Pyetje të shpejta dhen Brainstorming Vizual.</span><br>• Pyetje: "Nga dallojnë bimët nga kafshët për ushqimin?", "Pse gjethet janë të gjelbra?". Shënohet termi 'Vetëushqyerje'.<br>• <span class="pjerret">(Për nxënësin med AK: Prek gjethen e freskët për të ndier teksturën dhen tregon ngjyrën përmes një kartele të gjelbër)</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Ndërtimi i njohurive të reja</span><br><br>25 min</td><td colspan="3"><span class="bold">Teknika: Vëzhgim i udhëhequr dhen Diagramë skematike.</span><br>• <span class="bold">Hapi 1:</span> Ekuacioni i fotosintezës: Ujë + CO2 + Dritë -> Glukozë + Oksigjen. <span class="pjerret">(AK ndjek skemën përmes kartelave med ilustrime: pikë uji, diell, gjethe, re oksigjeni)</span>.<br>• <span class="bold">Hapi 2:</span> Lexohet fq. 56. Klorofili si "panel diellor". Krahasohet bima in errësirë med atë in dritë.<br>• <span class="bold">Hapi 3:</span> Skemë interaktive in projektor. Nxënësit tregojnë med shigjeta hyrjen e ujit (rrënjët) dhen gazit (stomat).</td></tr>
+                  <tr><td colspan="2"><span class="bold">Prezantimi i rezultateve</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Plotësimi i Skicës së Fotosintezës.</span><br>• Nxënësit vizatojnë një bimë dhen vendosin shigjetat e hyrjes/daljes për elementet. Korrigjim i ndërsjellë.<br>• <span class="pjerret">(Nxënësi med AK ngjit shigjeta të gatshme mbi një skicë të parapërgatitur nën drejtimn e mësuesit mbështetës)</span>.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Vlerësimi dhen feedback-u:</span> Nivelet (1-4).<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 1 (AK):</span> Identifikon bimën, rrënjët, gjethet in model real dhen lidh dritën med bimën med ndihmë.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 2:</span> Tregon elementet që i duhen bimës, bur ngatërron emërtimet e gazrave (O2 dhen CO2).<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 3:</span> Shpjegon saktë procesin, plotëson skicën pa gabime dhen tregon produktet përfundimtare.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 4:</span> Analizon rëndësinë globale in ekosistem dhen ndikimin e intensitetit të dritës.</td></tr>
+                  <tr><td colspan="5"><span class="bold">Diferencimi & Detyrat:</span><br>
+                    • <span class="bold">Avancuar:</span> Hulumtojnë rolin e stomave (porat) in rregullimin e gazrave dhen ujit në ditë të nxehta.<br>
+                    • <span class="bold">AK:</span> Ngjyros posterin e një gjetheje të madhe dhen ngjit një diell letre. Shtëpi: Ngjit 2 gjethe dhen shkruaj "BIMA".<br>
+                    • <span class="bold">Detyrat e tjera:</span> Elementet që thith bima (D1), plotësim paragrafi in fq. 42 (D2), ese për ndalimin e fotosintezës (D3).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Refleksioni i mësuesit:</span> Vlerësohet përfshirja e AK përmes kartelave dhen nëse koncepti i glukozës si ushqim i vetëprodhuar shkaktoi paqartësi.</td></tr>
+                </table></div>`;
+            modal.style.display = 'block';
+        }
 
-    <button class="no-print" onclick="window.print()">Printo</button>
-  `;
-}
-function invoiceHTML(b,r,bw=false){
-  return `<!doctype html><html><head><meta charset="utf-8"><title>${b.num}</title>${invoiceCSS(bw)}</head><body><div class="inv">${invoiceInner(b,r,bw)}</div></body></html>`;
-}
-async function downloadPDF(b,r,bw=false){
-  const { jsPDF } = window.jspdf;
-  const wrap=document.createElement('div');
-  wrap.innerHTML=invoiceCSS(bw)+`<div class="inv">${invoiceInner(b,r,bw)}</div>`;
-  wrap.style.width='794px'; document.body.appendChild(wrap);
-  const doc=new jsPDF('p','pt','a4');
-  await doc.html(wrap,{
-    x:24,y:24,
-    html2canvas:{scale:0.95,windowWidth:794},
-    callback:(d)=>{ d.save(`Fature_${b.num}${bw?'_BW':''}.pdf`); document.body.removeChild(wrap); }
-  });
-}
+        function showKimiDiary() {
+            modalTitle.innerText = "PLANIFIKIMI I ORËS MËSIMORE - KIMI";
+            modalBody.innerHTML = `
+                <div class="no-copy">
+                <table class="diary-table">
+                  <tr><td><span class="bold">Fusha:</span> Shkencat e natyrës</td><td><span class="bold">Lënda:</span> Kimi</td><td><span class="bold">Shkalla:</span> IV</td><td><span class="bold">Klasa:</span> VII</td><td><span class="bold">Data:</span> 14.05.2026</td></tr>
+                  <tr><td colspan="2"><span class="bold">Tema mësimore:</span> 4. Substancat e pastra, përzierjet dhen përbërjet kimike</td><td colspan="3"><span class="bold">Situata e të nxënit:</span> "Sallata e pemëve vs. Uji i kripur" (Krahasimi i një përzierjeje fizike ku përbërësit ndahen lehtë dhen një bashkimi ku krijohet një mjedis i ri homogjen).</td></tr>
+                  <tr><td colspan="3"><span class="bold">Rezultatet e të nxënit sipas kompetencave:</span><br><br>
+                        <span class="bold">Komunikimi:</span> Përkufizon substancën e pastër, përzierjen dhen përbërjen kimike duke përdorur saktë fjalorin.<br>
+                        <span class="bold">Të menduarit:</span> Dallon përzierjet homogjene nga ato heterogjene përmes vëzhgimit të mostrave.<br>
+                        <span class="bold">Personale:</span> Ndërgjegjësohet për praninë e përzierjeve in jetën e përditshme (ajri, uji i pijshëm).
+                    </td><td colspan="2"><span class="bold">Fjalët kyçe:</span> Substancë e pastër, Përzierje, Përbërje kimike, Homogjene, Heterogjene.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Burimet dhen Teknologjia:</span> Libri i Kimisë Klasa 7 fq. 34, Fletore Pune fq. 26, gota laboratorike, ujë, kripë, rërë, magnet, hekur. <span class="bold">TIK:</span> Projektor për rregullimin e grimcave/molekulave, kohëmatës.</td><td colspan="2"><span class="bold">Lidhja med fushat:</span> Fizikë (Magnetizmi, dendësia), Matematikë (Përpjesëtimet e tretjes).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Metodologjia dhen veprimtaritë e nxënësve</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">METODOLOGJIA</span></td><td colspan="3"><span class="bold">PËRSHKRIMI I VEPRIMTARIVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">Lidhja e temës med njohuritë e mëparshme</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Pyetje të shpejta dhen Brainstorming Laboratorik.</span><br>• Pyetje: "Çfarë ndodh po të trazojmë sheqer in ujë?", "Po rërë in ujë?". Shënohen shtyllat 'Tretet' dhen 'Nuk tretet'. Termat Homogjen/Heterogjen.<br>• <span class="pjerret">(Për nxënësin med AK: Vëzhgon dy gota reale: ujë med kripë dhen ujë med rërë, prek rërën për të ndier kokrrizat)</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Ndërtimi i njohurive të reja</span><br><br>25 min</td><td colspan="3"><span class="bold">Teknika: Eksperiment i demonstruar dhen Punë në grupe.</span><br>• <span class="bold">Hapi 1:</span> Përzierje rërë + tallash hekuri. Med magnet, ndahet hekuri. Shpjegimi: Te përzierjet substancat ruajnë vetitë. <span class="pjerret">(AK afron vetë magnetin dhen ndjen forcën e tërheqjes së grimcave)</span>.<br>• <span class="bold">Hapi 2:</span> Lexohet fq. 34. Te përbërjet kimike (uji H2O), elementet bashkohen rreptë dhen nuk ndahen med mënyra fizike.<br>• <span class="bold">Hapi 3:</span> Shfaqen in projektor modelet e molekulave. Nxënësit dallojnë ndryshimin e strukturës.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Prezantimi i rezultateve</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Tabela e Klasifikimit "Përzierje vs. Përbërje".</span><br>• Plotësimi i tabelës in dyshe për 3 raste (Ajri, Kripa, Uji i detit). Përcaktohet lloji i lëndës. Korrigjim.<br>• <span class="pjerret">(Nxënësi med AK punon med karta ilustruese ku ngjit Mongol e magnetit pranë përzierjeve që ndahen)</span>.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Vlerësimi dhen feedback-u:</span> Nivelet (1-4).<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 1 (AK):</span> Dallon vizualisht përzierjen ku dallohen përbërësit (ujë-rërë) nga uji i pastër, përdor magnetin med ndihmë.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 2:</span> Përkufizon përzierjen, bur ka vështirësi in klasifikimin e saktë homogjen/heterogjen.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 3:</span> Klasifikon saktë lëndët, shpjegon dallimin dhen tregon mënyrën fizike të ndarjes.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 4:</span> Analizon in nivel mikroskopik lidhjet e grimcave dhen propozon skema për ndarje komplekse.</td></tr>
+                  <tr><td colspan="5"><span class="bold">Diferencimi & Detyrat:</span><br>
+                    • <span class="bold">Avancuar:</span> Hulumtojnë mbi "Kromatografinë" ose "Distilimin" e ujit të detit.<br>
+                    • <span class="bold">AK:</span> Lidh med vija figurën e kripës med gotën e ujit. Shtëpi: Vizato gotë med ujë dhen ngjit kokrra kripe të vërtetë.<br>
+                    • <span class="bold">Detyrat e tjera:</span> Shembuj in kuzhinë (D1), ushtrimi 4 in fq. 26 (D2), raport eksperimental ndarjeje (D3).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Refleksioni i mësuesit:</span> Vlerësohet nëse magneti ndihmoi AK të kuptonte ndarjen fizike dhen nëse koncepti i substancës së pastër shkaktoi konfuzion.</td></tr>
+                </table></div>`;
+            modal.style.display = 'block';
+        }
 
-/* ===== Boot ===== */
-function initApp(){
-  const s=session(); if(!s) return;
-  $('#role').textContent=s.role; $('#who').textContent=s.name||s.id;
+        function showTikDiary() {
+            modalTitle.innerText = "PLANIFIKIMI I ORËS MËSIMORE - TIK";
+            modalBody.innerHTML = `
+                <div class="no-copy">
+                <table class="diary-table">
+                  <tr><td><span class="bold">Fusha:</span> TIK dhen Teknologji</td><td><span class="bold">Lënda:</span> TIK</td><td><span class="bold">Shkalla:</span> III</td><td><span class="bold">Klasa:</span> V</td><td><span class="bold">Data:</span> 05.05.2026</td></tr>
+                  <tr><td colspan="2"><span class="bold">Tema mësimore:</span> 4. Siguria në internet dhen të dhënat tona personale</td><td colspan="3"><span class="bold">Situata e të nxënit:</span> "Pasaporta ime digjitale" (Praktikimi i rregullave të sigurisë gjatë lundrimit, fokusuar in identificación e informacioneve që ndahen dhen krijimin e fjalëkalimit).</td></tr>
+                  <tr><td colspan="3"><span class="bold">Rezultatet e të nxënit sipas kompetencave:</span><br><br>
+                        <span class="bold">Komunikimi:</span> Shpjegon rëndësinë e ruajtjes së privatësisë në internet dhen përdor fjalor të saktë teknologjik.<br>
+                        <span class="bold">Të menduarit:</span> Klasifikon të dhënat in të sigurta (ngjyra) dhen private (fjalëkalimi, adresa).<br>
+                        <span class="bold">Personale:</span> Kupton rreziqet virtuale dhen ndërgjegjësohet për të kërkuar ndihmë te prindërit/mësuesit.
+                    </td><td colspan="2"><span class="bold">Fjalët kyçe:</span> Internet, Siguri, Të dhëna personale, Fjalëkalim, Privatësi, Rrezik virtual.</td></tr>
+                  <tr><td colspan="3"><span class="bold">Burimet dhen Teknologjia:</span> Libri i TIK Klasa 5 fq. 18, Fletore Pune fq. 12. <span class="bold">TIK:</span> Projektor për faqe regjistrimi imagjinare, kohëmatës digjital për lojën e fjalëkalimeve.</td><td colspan="2"><span class="bold">Lidhja med fushat:</span> Edukim për Shoqërinë (Qytetaria digjitale), Gjuhë Shqipe.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Metodologjia dhen veprimtaritë e nxënësve</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">METODOLOGJIA</span></td><td colspan="3"><span class="bold">PËRSHKRIMI I VEPRIMTARIVE</span></td></tr>
+                  <tr><td colspan="2"><span class="bold">Lidhja e temës med njohuritë e mëparshme</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Pyetje të shpejta dhen Kategorizim in dërrasë.</span><br>• Pyetje: "Kush luan lojëra në internet?", "Nëse kërkohet numri i telefonit, a duhet t'ia jepni?". Listojmë llojet e të dhënave.<br>• <span class="pjerret">(Për nxënësin med AK: Karta vizuale med dy ngjyra – kyç i mbyllur jeshil për të dhënat që fshihen, kyç i hapur i kuq për ato që s'tregohen)</span>.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Ndërtimi i njohurive të reja</span><br><br>25 min</td><td colspan="3"><span class="bold">Teknika: Analizë rasti dhen Demonstrim in projektor.</span><br>• <span class="bold">Hapi 1:</span> Rregulli i fjalëkalimit të fortë (shkronja, numra, simbole). <span class="pjerret">(AK ndjek një fjalëkalim med pulla të mëdha magnetike med ngjyra për të dalluar shkronjat nga numrat)</span>.<br>• <span class="bold">Hapi 2:</span> Semafori i informacionit (fq. 18). Emri, adresa, fotoja janë "Zona e Kuqe". Libri, kafshët janë "Zona e Gjelbër".<br>• <span class="bold">Hapi 3:</span> Praktikë: Shfaqet profil imagjinar i një fëmije. Nxënësit gjejnë gabimet e profilit publik.</td></tr>
+                  <tr><td colspan="2"><span class="bold">Prezantimi i rezultateve</span><br><br>10 min</td><td colspan="3"><span class="bold">Teknika: Krijimi i Mburojës së Privatësisë.</span><br>• Nxënësit vizatojnë një mburojë dhen shkruajnë 3 gjëra të fshehta (fjalëkalim, vendndodhje). Shkëmbim fletoresh dhen vlerësim.<br>• <span class="pjerret">(Nxënësi med AK ngjit një pullë të madhe in formë kyçi mbi fjalën "FJALËKALIMI" në fletore)</span>.</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Vlerësimi dhen feedback-u:</span> Nivelet (1-4).<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 1 (AK):</span> Identifikon Mongol e kyçit dhen dallon med ndihmë një sjellje të rrezikshme përmes kartave vizuale.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 2:</span> Di që duhet fjalëkalim, bur krijon struktura shumë të thjeshta (123456) dhen ngatërron fshehjen e adresës.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 3:</span> Klasifikon saktë të dhënat publike nga ato private dhen ndërton fjalëkalim të sigurt.<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bold">Niveli 4:</span> Analizon situata komplekse (mesazhe nga të huajt) dhen argumenton hapat mbrojtës e raportimin.</td></tr>
+                  <tr><td colspan="5"><span class="bold">Diferencimi & Detyrat:</span><br>
+                    • <span class="bold">Avancuar:</span> "Ekspertë të Kibersigurisë" - hartojnë poster med 3 këshilla kundër Cyberbullying.<br>
+                    • <span class="bold">AK:</span> Ngjyros vetëm butonat e kompjuterit med Mongol të sigurta, ngjit "STOP" mbi mesazh të dyshimtë. Shtëpi: Shkruaj "SIGURI".<br>
+                    • <span class="bold">Detyrat e tjera:</span> 3 të dhëna private (D1), ushtrime in fq. 12 (D2) ose Kodi i Sigurisë Familjare (D3).</td></tr>
+                  <tr><td colspan="5" class="bg-gray"><span class="bold">Refleksioni i mësuesit:</span> Vlerësohet nëse semafori ndihmoi AK dhen nëse piveli mesatar kuptoi që emri i shkollës është e dhënë private.</td></tr>
+                </table></div>`;
+            modal.style.display = 'block';
+        }
 
-  const isAdmin=(s.role==='admin');
-  if(isAdmin){ qa('.admin-gate').forEach(el=>el.classList.remove('admin-gate')); }
-
-  // form njoftimesh mbyllur
-  $('#addNoticeCard').classList.add('hidden');
-
-  drawResidents();
-  fillResidentsInSelect();
-  drawBills();
-  drawNotices();
-}
-(function(){
-  ensureAdmin();
-  const s=session();
-  if(s){
-    $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
-    initApp();
-    if(!location.hash) location.hash = '#/banore';
-    router();
-  }else{
-    router();
-  }
-})();
-</script>
+        function showImage(imgUrl) { modalTitle.innerText = "Pamje SMIP"; modalBody.innerHTML = `<img src="${imgUrl}" class="mx-auto rounded-xl shadow-lg">`; modal.style.display = 'block'; }
+        function showText(title, text) { modalTitle.innerText = title; modalBody.innerHTML = `<p class="text-center py-10 italic font-medium">${text}</p>`; modal.style.display = 'block'; }
+        function closeModal() { modal.style.display = 'none'; }
+    </script>
 </body>
 </html>
