@@ -1,35 +1,15 @@
-# Administrimi i Pallatit
+Asistenti i Ditarit Kurrikular (ASCAP) — Pro
+Asistenti i Ditarit Kurrikular (ASCAP) është një program softuerik i specializuar dhe inovativ, i dizajnuar posaçërisht për mësuesit e arsimit parauniversitar në Shqipëri. Ai automatizon dhe thjeshton në maksimum procesin e krijimit të ditarëve ditorë të orës së mësimit, duke respektuar në mënyrë rigoroze standardet dhe kornizat zyrtare të ASCAP (Agjencia e Sigurimit të Cilësisë së Arsimit Parauniversitar).
 
-Aplikacion një-faqësh (SPA) për menaxhimin e banorëve, faturave dhe njoftimeve të një pallati. Krejtësisht **client-side** (HTML/CSS/JS) me ruajtje lokale në **localStorage** — s’ka server apo databazë.
+Karakteristikat Kryesore:
+Përshtatje Unike sipas Klasës & Lëndës: Çdo ditar gjenerohet me shkallëzim akademik unik (fjalor, situata të nxëni, kompetenca dhe detyra që ndryshojnë nga klasa e 1-rë deri në gjimnaz), duke shmangur përsëritjet.
 
-## ⚙️ Veçori kryesore
+Mbështetje për Mësuesit me Shumë Lëndë: Ofron mundësinë e licencimit të paketave me 2 deri në 3 lëndë (p.sh. kombinimet e shpeshta si Histori - Gjeografi - Qytetari).
 
-- **Roli Admin & Rezident**
-  - Admin: shton/ndërshkon/edito banorë, krijon fatura, poston njoftime, ndryshon statusin e faturave, print/PDF (me dhe pa ngjyra), dërgon mesazh WhatsApp.
-  - Rezident: **vetëm shikon** banorët, faturat e **vete** dhe njoftimet (nuk sheh butonat “Shto …”).
-- **Hyrja & Sesioni**
-  - Hyrje me `ID` + `Password`. Default admin: **admin / admin**.
-  - Pas hyrjes hapet automatikisht seksioni **Banorët** në një tab të ri (`#/banore`).
-  - “Reset Admin” rivendos `admin/admin` dhe pastron të dhënat lokale.
-- **Strukturë me Tabe**
-  - `Banorët`, `Faturat`, `Njoftimet` (navigim me `hash router`).
-- **Faturat**
-  - Numërim automatik: `FAT-YYYY-0001`.
-  - Përshkrim auto sipas muajit; status **Në pritje/Paguar**.
-  - WhatsApp: gjeneron mesazh të gatshëm për pagesë.
-  - Print & **PDF** (ngjyra) dhe **PDF (B/W)** ku “Afati” & “Statusi” janë **me të zezë, bold**.
-- **Njoftimet**
-  - Tekst + imazh (ngarkohet si DataURL, ruhet në localStorage).
-- **Fjalëkalime**
-  - Admin/rezident mund të **ndryshojë fjalëkalimin e vet**.
-  - Admin mund të **ndryshojë fjalëkalimin e banorëve**.
-- **Persistencë**
-  - `localStorage` (s’ka backend). Çelësat:
-    - `pal_users_v4`, `pal_session_v4`, `pal_bills_v4`, `pal_notices_v4`, `pal_inv_counter_v4`.
+Integrim i Librit në PDF (Opsionale): Mësuesit mund të ngarkojnë librin dixhital të klasës përkatëse, duke e lejuar sistemin t'i përshtasë ushtrimet dhe detyrat direkt nga teksti i tyre.
 
-## 🚀 Si ta nisësh
+Sistemi i Drejtuar për Nxënësit me AK: Përfshin menaxhimin e kujdesshëm dhe konfidencial (me iniciale) të nxënësve me plan të veçantë.
 
-1. Klono repo-n:
-   ```bash
-   git clone https://github.com/Artidori/administrimi-i-pallatit.git
-   cd administrimi-i-pallatit
+Eksportim Direkt në Word (.docx): Ditarët krijohen menjëherë në formatin zyrtar të gatshëm për t'u shkarkuar, redaktuar apo printuar.
+
+Siguri dhe Licencim i Integruar: Përfshin sistem regjistrimi të personalizuar të mësuesit (Emër, Mbiemër, Telefon, Email), mbrojtje të licencës për 1 kompjuter, si dhe modalitet provë falas për 5 ditarët e parë.
